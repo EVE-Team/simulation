@@ -1,12 +1,12 @@
 #include "resourcemanager.h"
-#include <QtDebug>
 
 ResourceManager *ResourceManager::m_instance = nullptr;
 
 ResourceManager::ResourceManager()
-    : texGrass(":/images/grass.png")
+    : texGrass(":/images/grass.png"),
+      texWater(":/images/water.png"),
+      texRock(":/images/rock.png")
 {
-    qDebug() << texGrass.size();
 }
 
 ResourceManager *ResourceManager::instance()
@@ -19,4 +19,14 @@ ResourceManager *ResourceManager::instance()
 const QImage &ResourceManager::grassTexture() const
 {
     return texGrass;
+}
+
+const QImage &ResourceManager::waterTexture() const
+{
+    return texWater;
+}
+
+const QImage &ResourceManager::rockTexture() const
+{
+    return texRock;
 }

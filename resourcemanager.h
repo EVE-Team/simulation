@@ -9,13 +9,15 @@ public:
     static ResourceManager *instance();
 
     const QImage &grassTexture() const;
+    const QImage &waterTexture() const;
+    const QImage &rockTexture() const;
 
 private:
     ResourceManager();
 
     static ResourceManager *m_instance;
 
-    QImage texGrass;
+    QImage texGrass, texWater, texRock;
 };
 
 #endif // RESOURCEMANAGER_H
