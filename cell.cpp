@@ -32,9 +32,14 @@ void Cell::renderAt(QPainter &painter, QPoint pos) const
     }
     painter.drawImage(QRect(0, 0, cellSize, cellSize), texure);
 
+    painter.drawImage(QPoint(11, 1), ResourceManager::instance()->sunIcon());
+    painter.drawImage(QPoint(36, 1), ResourceManager::instance()->rainIcon());
+    painter.drawImage(QPoint(63, 1), ResourceManager::instance()->grassIcon());
+
     painter.setPen(Qt::white);
-    painter.drawText(QRect(0, 0, cellSize, cellSize), Qt::AlignHCenter,
-                     QString("S:%1 R:%2 G:%3\n%4 %5").arg(sun).arg(rain).arg(grass).arg(posX).arg(posY));
+    painter.drawText(QPoint(26, 13), QString::number(sun));
+    painter.drawText(QPoint(52, 13), QString::number(rain));
+    painter.drawText(QPoint(79, 13), QString::number(grass));
 
     painter.restore();
 }
