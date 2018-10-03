@@ -3,10 +3,13 @@
 
 #include <QPainter>
 
+class World;
+
 class Cell
 {
 public:
-    Cell();
+    Cell() { abort(); }
+    Cell(World *parent);
 
     enum Terrain
     {
@@ -16,6 +19,8 @@ public:
     };
 
     void renderAt(QPainter &painter, QPoint pos) const;
+
+    void setPosition(int x, int y);
 
     Terrain getTerrain() const;
     void setTerrain(Terrain terrain);
@@ -30,6 +35,11 @@ public:
 protected:
     Terrain terrain;
     int sun, rain, grass;
+
+    World *parent;
+    int posX, posY;
+
+    bool isNearWater() const;
 };
 
 #endif // CELL_H

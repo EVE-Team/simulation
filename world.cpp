@@ -2,9 +2,10 @@
 #include <QVector>
 
 World::World(QSize size)
-    : cells(size.width() * size.height()),
+    : cells(size.width() * size.height(), Cell(this)),
       size(size)
 {
+    setCellsPositions();
 }
 
 void World::render(QPainter &painter)
@@ -32,6 +33,7 @@ void World::resize(QSize newSize)
 {
     size = newSize;
     cells.resize(size.width() * size.height());
+    setCellsPositions();
 }
 
 QSize World::getSize() const
@@ -46,6 +48,17 @@ void World::advance()
         for (int y = 0; y < size.height(); y++)
         {
             cellAt(x, y)->advance();
+        }
+    }
+}
+
+void World::setCellsPositions()
+{
+    for (int x = 0; x < size.width(); x++)
+    {
+        for (int y = 0; y < size.height(); y++)
+        {
+            cellAt(x, y)->setPosition(x, y);
         }
     }
 }
