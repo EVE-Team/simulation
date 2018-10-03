@@ -54,17 +54,22 @@ void MainWindow::resizeEvent(QResizeEvent* event)
 
 void MainWindow::redrawWorld()
 {
-    QPixmap pixmap(ui->lblDrawArea->width(), ui->lblDrawArea->height());
-    pixmap.fill(Qt::transparent);
+    const QSize renderAreaSize = ui->lblDrawArea->size();
+    if (renderBuffer.size() != renderAreaSize)
+    {
+        renderBuffer = QPixmap(renderAreaSize);
+    }
 
-    QPainter painter(&pixmap);
+    renderBuffer.fill(Qt::transparent);
+
+    QPainter painter(&renderBuffer);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.translate(translPoint);
     painter.scale(zoomLevel, zoomLevel);
 
     world.render(painter);
 
-    ui->lblDrawArea->setPixmap(pixmap);
+    ui->lblDrawArea->setPixmap(renderBuffer);
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)

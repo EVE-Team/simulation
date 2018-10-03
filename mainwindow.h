@@ -34,6 +34,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
+    QPixmap renderBuffer;
+
     double zoomLevel;
     QPoint translPoint;
 
