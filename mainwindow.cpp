@@ -60,9 +60,13 @@ void MainWindow::redrawWorld()
         renderBuffer = QPixmap(renderAreaSize);
     }
 
-    renderBuffer.fill(Qt::transparent);
-
     QPainter painter(&renderBuffer);
+
+    QRect fullArea(0, 0, renderAreaSize.width(), renderAreaSize.height());
+    painter.fillRect(fullArea, QBrush(Qt::lightGray));
+    QBrush background(Qt::darkGray, Qt::Dense4Pattern);
+    painter.fillRect(fullArea, background);
+
     painter.setRenderHint(QPainter::Antialiasing);
     painter.translate(translPoint);
     painter.scale(zoomLevel, zoomLevel);
