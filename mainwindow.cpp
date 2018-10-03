@@ -41,10 +41,15 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::resizeEvent(QResizeEvent* event)
 {
-    world.advance();
-    redrawWorld();
+   QMainWindow::resizeEvent(event);
+
+   ui->lblDrawArea->move(5, 5);
+   ui->lblDrawArea->resize(size().width() - ui->btnTick->size().width() - 10, size().height() - 5);
+   ui->btnTick->move(ui->lblDrawArea->size().width() + 10, 5);
+
+   redrawWorld();
 }
 
 void MainWindow::redrawWorld()
@@ -144,4 +149,10 @@ void MainWindow::on_lblDrawArea_mouseButtonRelease(QMouseEvent *event)
         ui->lblDrawArea->setCursor(Qt::OpenHandCursor);
         isPanning = false;
     }
+}
+
+void MainWindow::on_btnTick_clicked()
+{
+    world.advance();
+    redrawWorld();
 }
