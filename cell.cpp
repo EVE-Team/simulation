@@ -17,13 +17,20 @@ void Cell::renderAt(QPainter &painter, QPoint pos) const
     painter.save();
     painter.translate(pos * cellSize);
 
-    if (terrain == Terrain::Grass)
+    QImage texure;
+    switch (terrain)
     {
-        painter.drawImage(QRect(0, 0, cellSize, cellSize), ResourceManager::instance()->grassTexture());
-    } else {
-        painter.setBrush(QBrush(terrainColors[terrain]));
-        painter.drawRect(0, 0, cellSize, cellSize);
+    case Terrain::Grass:
+        texure = ResourceManager::instance()->grassTexture();
+        break;
+    case Terrain::Mountain:
+        texure = ResourceManager::instance()->rockTexture();
+        break;
+    case Terrain::Water:
+        texure = ResourceManager::instance()->waterTexture();
+        break;
     }
+    painter.drawImage(QRect(0, 0, cellSize, cellSize), texure);
 
     painter.drawText(QRect(0, 0, cellSize, cellSize), Qt::AlignHCenter, QString("S:%1 R:%2 G:%3").arg(sun).arg(rain).arg(grass));
 
