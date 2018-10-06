@@ -3,5 +3,8 @@
         <file>grass.png</file>
         <file>rock.png</file>
         <file>water.png</file>
+        <file>sun.png</file>
+        <file>rain.png</file>
+        <file>grass_icon.png</file>
     </qresource>
 </RCC>

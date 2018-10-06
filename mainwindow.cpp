@@ -41,25 +41,39 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::resizeEvent(QResizeEvent* event)
 {
-    world.advance();
-    redrawWorld();
+   QMainWindow::resizeEvent(event);
+
+   ui->lblDrawArea->move(5, 5);
+   ui->lblDrawArea->resize(size().width() - ui->btnTick->size().width() - 10, size().height() - 5);
+   ui->btnTick->move(ui->lblDrawArea->size().width() + 10, 5);
+
+   redrawWorld();
 }
 
 void MainWindow::redrawWorld()
 {
-    QPixmap pixmap(ui->lblDrawArea->width(), ui->lblDrawArea->height());
-    pixmap.fill(Qt::transparent);
+    const QSize renderAreaSize = ui->lblDrawArea->size();
+    if (renderBuffer.size() != renderAreaSize)
+    {
+        renderBuffer = QPixmap(renderAreaSize);
+    }
 
-    QPainter painter(&pixmap);
+    QPainter painter(&renderBuffer);
+
+    QRect fullArea(0, 0, renderAreaSize.width(), renderAreaSize.height());
+    painter.fillRect(fullArea, QBrush(Qt::lightGray));
+    QBrush background(Qt::darkGray, Qt::Dense4Pattern);
+    painter.fillRect(fullArea, background);
+
     painter.setRenderHint(QPainter::Antialiasing);
     painter.translate(translPoint);
     painter.scale(zoomLevel, zoomLevel);
 
     world.render(painter);
 
-    ui->lblDrawArea->setPixmap(pixmap);
+    ui->lblDrawArea->setPixmap(renderBuffer);
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
@@ -144,4 +158,10 @@ void MainWindow::on_lblDrawArea_mouseButtonRelease(QMouseEvent *event)
         ui->lblDrawArea->setCursor(Qt::OpenHandCursor);
         isPanning = false;
     }
+}
+
+void MainWindow::on_btnTick_clicked()
+{
+    world.advance();
+    redrawWorld();
 }

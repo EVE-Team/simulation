@@ -24,13 +24,17 @@ protected:
     void on_lblDrawArea_mouseButtonPress(QMouseEvent *event);
     void on_lblDrawArea_mouseButtonRelease(QMouseEvent *event);
 
+    void resizeEvent(QResizeEvent* event);
+
     void redrawWorld();
 
 private slots:
-    void on_pushButton_clicked();
+    void on_btnTick_clicked();
 
 private:
     Ui::MainWindow *ui;
+
+    QPixmap renderBuffer;
 
     double zoomLevel;
     QPoint translPoint;

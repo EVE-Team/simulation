@@ -22,6 +22,8 @@ public:
 protected:
     QVector<Cell> cells;
     QSize size;
+
+    void setCellsPositions();
 };
 
 #endif // WORLD_H

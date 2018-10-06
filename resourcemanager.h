@@ -12,12 +12,17 @@ public:
     const QImage &waterTexture() const;
     const QImage &rockTexture() const;
 
+    const QImage &sunIcon() const;
+    const QImage &rainIcon() const;
+    const QImage &grassIcon() const;
+
 private:
     ResourceManager();
 
     static ResourceManager *m_instance;
 
     QImage texGrass, texWater, texRock;
+    QImage iconSun, iconRain, iconGrass;
 };
 
 #endif // RESOURCEMANAGER_H

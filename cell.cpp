@@ -1,14 +1,14 @@
 #include <QRandomGenerator>
 #include "cell.h"
 #include "resourcemanager.h"
-
-QColor terrainColors[] = { Qt::green, Qt::blue, Qt::lightGray };
+#include "world.h"
 
 const int cellSize = 100;
 
-Cell::Cell()
-    : terrain(Terrain::Grass), sun(0),
-      rain(0), grass(0)
+Cell::Cell(World *parent)
+    : terrain(Terrain::Grass),
+      parent(parent),
+      sun(0), rain(0), grass(0)
 {
 }
 
@@ -32,7 +32,14 @@ void Cell::renderAt(QPainter &painter, QPoint pos) const
     }
     painter.drawImage(QRect(0, 0, cellSize, cellSize), texure);
 
-    painter.drawText(QRect(0, 0, cellSize, cellSize), Qt::AlignHCenter, QString("S:%1 R:%2 G:%3").arg(sun).arg(rain).arg(grass));
+    painter.drawImage(QPoint(11, 1), ResourceManager::instance()->sunIcon());
+    painter.drawImage(QPoint(36, 1), ResourceManager::instance()->rainIcon());
+    painter.drawImage(QPoint(63, 1), ResourceManager::instance()->grassIcon());
+
+    painter.setPen(Qt::white);
+    painter.drawText(QPoint(26, 13), QString::number(sun));
+    painter.drawText(QPoint(52, 13), QString::number(rain));
+    painter.drawText(QPoint(79, 13), QString::number(grass));
 
     painter.restore();
 }
@@ -78,16 +85,28 @@ void Cell::processGrass()
         return;
     }
 
-    // 3 (Ливень)    0 (Нет солнца)    Трава умирает
-    // 0 (Нет дождя) 3 (Жгучее солнце) Высыхает трава
-    if ((rain == 0 && sun == 3) || (rain == 3 && sun == 0))
+    if (isNearWater() && sun > 0)
     {
+        // Вокруг озера или реки трава растет всегда, когда есть солнце, даже если дождь не идет.
+        grass++;
+    }
+    else if ((rain == 0 && sun == 3) || (rain == 3 && sun == 0))
+    {
+        // 3 (Ливень)    0 (Нет солнца)    Трава умирает
+        // 0 (Нет дождя) 3 (Жгучее солнце) Высыхает трава
         grass--;
     }
     else if ((sun == 1 && (rain == 1 || rain == 2)) ||
              (sun == 2 && rain != 0) ||
              (sun == 3 && rain >= 2))
     {
+        // 1 (Слабый дождик) 1 (Слабое солнце)  Растет трава
+        // 2 (Средний дождь) 1 (Слабое солнце)  Растет трава
+        // 1 (Слабый дождик) 2 (Сильное солнце) Растет трава
+        // 2 (Средний дождь) 2 (Сильное солнце) Растет трава
+        // 3 (Ливень)        2 (Сильное солнце) Растет трава
+        // 2 (Средний дождь) 3 (Жгучее солнце)  Растет трава
+        // 3 (Ливень)        3 (Жгучее солнце)  Растет трава
         grass++;
     }
 
@@ -99,4 +118,28 @@ void Cell::advance()
 {
     setRandomWeather();
     processGrass();
+}
+
+void Cell::setPosition(int x, int y)
+{
+    posX = x; posY = y;
+}
+
+bool Cell::isNearWater() const
+{
+    for (int x = posX - 1; x <= posX + 1; x++)
+    {
+        for (int y = posY - 1; y <= posY + 1; y++)
+        {
+            if (x >= 0 && y >= 0 && x < parent->getSize().width() && y < parent->getSize().height())
+            {
+                if (parent->cellAt(x, y)->getTerrain() == Terrain::Water)
+                {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
 }
