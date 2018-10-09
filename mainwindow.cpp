@@ -43,13 +43,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
-   QMainWindow::resizeEvent(event);
+    QMainWindow::resizeEvent(event);
 
-   ui->lblDrawArea->move(5, 5);
-   ui->lblDrawArea->resize(size().width() - ui->btnTick->size().width() - 10, size().height() - 5);
-   ui->btnTick->move(ui->lblDrawArea->size().width() + 10, 5);
+    ui->lblDrawArea->move(5, 5);
+    ui->lblDrawArea->resize(size().width() - ui->grControls->size().width() - 10, size().height() - 5);
+    ui->grControls->move(ui->lblDrawArea->size().width() + 10, 5);
+    ui->grControls->resize(ui->grControls->size().width(), ui->lblDrawArea->size().height());
 
-   redrawWorld();
+    redrawWorld();
 }
 
 void MainWindow::redrawWorld()
@@ -162,6 +163,10 @@ void MainWindow::on_lblDrawArea_mouseButtonRelease(QMouseEvent *event)
 
 void MainWindow::on_btnTick_clicked()
 {
-    world.advance();
+    for (int i = 0; i < ui->spnTickCount->value(); i++)
+    {
+        world.advance();
+    }
+
     redrawWorld();
 }
