@@ -31,6 +31,8 @@ protected:
 private slots:
     void on_btnTick_clicked();
 
+    void on_btnResize_clicked();
+
 private:
     Ui::MainWindow *ui;
 

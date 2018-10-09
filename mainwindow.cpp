@@ -6,7 +6,7 @@
 #include <QWheelEvent>
 
 const double zoomScaleFactor = 1.5;
-const QSize worldSize(3, 3);
+const QSize worldSize(3, 3); // default world size
 
 const Cell::Terrain terrain[3][3] =
     {
@@ -25,6 +25,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     qApp->installEventFilter(this);
 
+    ui->spnWidth->setValue(world.getSize().width());
+    ui->spnHeight->setValue(world.getSize().height());
+
+    // initialize terrain
     for (int x = 0; x < world.getSize().width(); x++)
     {
         for (int y = 0; y < world.getSize().height(); y++)
@@ -33,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
         }
     }
 
+    // render world
     redrawWorld();
 }
 
@@ -168,5 +173,11 @@ void MainWindow::on_btnTick_clicked()
         world.advance();
     }
 
+    redrawWorld();
+}
+
+void MainWindow::on_btnResize_clicked()
+{
+    world.resize(QSize(ui->spnWidth->value(), ui->spnHeight->value()));
     redrawWorld();
 }

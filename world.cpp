@@ -23,7 +23,7 @@ Cell *World::cellAt(int x, int y)
 {
     if (x >= 0 && y >= 0 && x < size.width() && y < size.height())
     {
-        return &cells[x * size.width() + y];
+        return &cells[y * size.width() + x];
     } else {
         return nullptr;
     }
@@ -31,8 +31,24 @@ Cell *World::cellAt(int x, int y)
 
 void World::resize(QSize newSize)
 {
+    int newElemCount = newSize.width() * newSize.height();
+    int numOfNewElements = newElemCount - cells.size();
+
     size = newSize;
-    cells.resize(size.width() * size.height());
+    if (numOfNewElements < 0)
+    {
+        cells.resize(newElemCount);
+    } else if (numOfNewElements > 0) {
+        // avoid adding new elements with default constructor
+        cells.reserve(newElemCount);
+        for (int i = 0 ; i < numOfNewElements; i++)
+        {
+            cells.append(Cell(this));
+        }
+    }
+
+    assert(newElemCount == cells.size());
+
     setCellsPositions();
 }
 

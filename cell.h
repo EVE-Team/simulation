@@ -8,6 +8,7 @@ class World;
 class Cell
 {
 public:
+    // QVector requires us to have empty constructor, even though it's never called
     Cell() { abort(); }
     Cell(World *parent);
 
