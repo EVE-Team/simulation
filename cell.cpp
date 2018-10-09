@@ -21,7 +21,7 @@ void Cell::renderAt(QPainter &painter, QPoint pos) const
     switch (terrain)
     {
     case Terrain::Grass:
-        texure = ResourceManager::instance()->grassTexture();
+        texure = ResourceManager::instance()->grassTexture(grass);
         break;
     case Terrain::Mountain:
         texure = ResourceManager::instance()->rockTexture();

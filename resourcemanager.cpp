@@ -3,13 +3,16 @@
 ResourceManager *ResourceManager::m_instance = nullptr;
 
 ResourceManager::ResourceManager()
-    : texGrass(":/images/grass.png"),
-      texWater(":/images/water.png"),
+    : texWater(":/images/water.png"),
       texRock(":/images/rock.png"),
       iconSun(":/images/sun.png"),
       iconRain(":/images/rain.png"),
       iconGrass(":/images/grass_icon.png")
 {
+    for (int i = 0; i <= 5; i++)
+    {
+        texGrass[i] = QImage(QString(":/images/grass%1.png").arg(i));
+    }
 }
 
 ResourceManager *ResourceManager::instance()
@@ -19,9 +22,10 @@ ResourceManager *ResourceManager::instance()
     return m_instance;
 }
 
-const QImage &ResourceManager::grassTexture() const
+const QImage &ResourceManager::grassTexture(int level) const
 {
-    return texGrass;
+    assert(level >= 0 && level <= 5);
+    return texGrass[level];
 }
 
 const QImage &ResourceManager::waterTexture() const
