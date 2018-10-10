@@ -27,13 +27,16 @@ SOURCES += \
         mainwindow.cpp \
     cell.cpp \
     world.cpp \
-    resourcemanager.cpp
+    resourcemanager.cpp \
+    terraingenerator.cpp
 
 HEADERS += \
         mainwindow.h \
     cell.h \
     world.h \
-    resourcemanager.h
+    resourcemanager.h \
+    terraingenerator.h \
+    terraingenerator.h
 
 FORMS += \
         mainwindow.ui
