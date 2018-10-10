@@ -1,11 +1,12 @@
 #include "world.h"
+#include "terraingenerator.h"
 #include <QVector>
 
 World::World(QSize size)
     : cells(size.width() * size.height(), Cell(this)),
       size(size)
 {
-    setCellsPositions();
+    rebuildWorld();
 }
 
 void World::render(QPainter &painter)
@@ -49,7 +50,7 @@ void World::resize(QSize newSize)
 
     assert(newElemCount == cells.size());
 
-    setCellsPositions();
+    rebuildWorld();
 }
 
 QSize World::getSize() const
@@ -68,13 +69,19 @@ void World::advance()
     }
 }
 
-void World::setCellsPositions()
+void World::rebuildWorld()
 {
+    TerrainGenerator tgen(size);
+
+    // reset all cells
     for (int x = 0; x < size.width(); x++)
     {
         for (int y = 0; y < size.height(); y++)
         {
-            cellAt(x, y)->setPosition(x, y);
+            Cell *cell = cellAt(x, y);
+            *cell = Cell(this);
+            cell->setPosition(x, y);
+            cell->setTerrain(tgen.getTerrain(y, x));
         }
     }
 }

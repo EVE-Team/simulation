@@ -8,13 +8,6 @@
 const double zoomScaleFactor = 1.5;
 const QSize worldSize(3, 3); // default world size
 
-const Cell::Terrain terrain[3][3] =
-    {
-      { Cell::Terrain::Water, Cell::Terrain::Water,    Cell::Terrain::Grass },
-      { Cell::Terrain::Grass, Cell::Terrain::Mountain, Cell::Terrain::Grass },
-      { Cell::Terrain::Grass, Cell::Terrain::Grass,    Cell::Terrain::Grass }
-    };
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -27,15 +20,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->spnWidth->setValue(world.getSize().width());
     ui->spnHeight->setValue(world.getSize().height());
-
-    // initialize terrain
-    for (int x = 0; x < world.getSize().width(); x++)
-    {
-        for (int y = 0; y < world.getSize().height(); y++)
-        {
-            world.cellAt(x, y)->setTerrain(terrain[y][x]);
-        }
-    }
 
     // render world
     redrawWorld();

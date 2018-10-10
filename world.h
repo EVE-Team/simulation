@@ -23,7 +23,9 @@ protected:
     QVector<Cell> cells;
     QSize size;
 
-    void setCellsPositions();
+    // called when the world is created or resized
+    // resets all cells and generates new terrain
+    void rebuildWorld();
 };
 
 #endif // WORLD_H
