@@ -163,3 +163,23 @@ bool Cell::isNearWater() const
 
     return false;
 }
+
+QPoint Cell::getPosition() const
+{
+    return QPoint(posX, posY);
+}
+
+int Cell::getSunLevel() const
+{
+    return sun;
+}
+
+int Cell::getRainLevel() const
+{
+    return rain;
+}
+
+int Cell::getGrassLevel() const
+{
+    return grass;
+}

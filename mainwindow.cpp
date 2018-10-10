@@ -57,7 +57,7 @@ void MainWindow::redrawWorld()
     QBrush background(Qt::darkGray, Qt::Dense4Pattern);
     painter.fillRect(fullArea, background);
 
-    painter.setRenderHint(QPainter::Antialiasing);
+    //painter.setRenderHint(QPainter::Antialiasing);
     painter.translate(translPoint);
     painter.scale(zoomLevel, zoomLevel);
 
@@ -110,10 +110,12 @@ void MainWindow::on_lblDrawArea_wheel(QWheelEvent *event)
 
 void MainWindow::on_lblDrawArea_mouseMove(QMouseEvent *event)
 {
+    QPoint mousePosition = event->pos();
+
     if (isPanning)
     {
         static QPoint lastPanDelta;
-        QPoint panDelta = event->pos() - panStartingPoint;
+        QPoint panDelta = mousePosition - panStartingPoint;
 
         if (lastPanDelta != panDelta)
         {
@@ -124,7 +126,41 @@ void MainWindow::on_lblDrawArea_mouseMove(QMouseEvent *event)
 
             lastPanDelta = panDelta;
         }
+    } else {
+        Cell *selectedCell = getCellFromFromPoint(mousePosition);
+        if (selectedCell == nullptr)
+        {
+            ui->lblTileInfo->setText("Selected tile: None");
+        } else {
+            const static char* terrainNames[] = { "Grass", "Water", "Mountain" };
+            ui->lblTileInfo->setText(QString("Selected tile: %1x%2\nTerrain: %3\nSun: %4\nRain: %5\nGrass: %6").
+                    arg(selectedCell->getPosition().x() + 1).arg(selectedCell->getPosition().y() + 1).
+                    arg(terrainNames[selectedCell->getTerrain()], QString::number(selectedCell->getSunLevel()),
+                                     QString::number(selectedCell->getRainLevel()),
+                                     QString::number(selectedCell->getGrassLevel())));
+        }
     }
+}
+
+Cell *MainWindow::getCellFromFromPoint(QPoint point)
+{
+    QTransform viewportTransform;
+    viewportTransform.translate(translPoint.x(), translPoint.y());
+    viewportTransform.scale(zoomLevel, zoomLevel);
+    viewportTransform = viewportTransform.inverted();
+
+    QPoint projectedPosition = viewportTransform.map(point);
+    if (projectedPosition.x() < 0 || projectedPosition.y() < 0)
+    {
+        return nullptr;
+    }
+    int tileX = projectedPosition.x() / 100, tileY = projectedPosition.y() / 100;
+    if (tileX >= world.getSize().width() || tileY >= world.getSize().height())
+    {
+        return nullptr;
+    }
+
+    return world.cellAt(tileX, tileY);
 }
 
 void MainWindow::on_lblDrawArea_mouseButtonPress(QMouseEvent *event)
