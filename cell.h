@@ -8,6 +8,7 @@ class World;
 class Cell
 {
 public:
+    // QVector requires us to have empty constructor, even though it's never called
     Cell() { abort(); }
     Cell(World *parent);
 
@@ -21,12 +22,16 @@ public:
     void renderAt(QPainter &painter, QPoint pos) const;
 
     void setPosition(int x, int y);
+    QPoint getPosition() const;
 
     Terrain getTerrain() const;
     void setTerrain(Terrain terrain);
 
     void setWeather(int sun, int rain);
     void setRandomWeather();
+    int getSunLevel() const;
+    int getRainLevel() const;
+    int getGrassLevel() const;
 
     void processGrass();
 

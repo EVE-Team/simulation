@@ -6,14 +6,7 @@
 #include <QWheelEvent>
 
 const double zoomScaleFactor = 1.5;
-const QSize worldSize(3, 3);
-
-const Cell::Terrain terrain[3][3] =
-    {
-      { Cell::Terrain::Water, Cell::Terrain::Water,    Cell::Terrain::Grass },
-      { Cell::Terrain::Grass, Cell::Terrain::Mountain, Cell::Terrain::Grass },
-      { Cell::Terrain::Grass, Cell::Terrain::Grass,    Cell::Terrain::Grass }
-    };
+const QSize worldSize(3, 3); // default world size
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -25,14 +18,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     qApp->installEventFilter(this);
 
-    for (int x = 0; x < world.getSize().width(); x++)
-    {
-        for (int y = 0; y < world.getSize().height(); y++)
-        {
-            world.cellAt(x, y)->setTerrain(terrain[y][x]);
-        }
-    }
+    ui->spnWidth->setValue(world.getSize().width());
+    ui->spnHeight->setValue(world.getSize().height());
 
+    // render world
     redrawWorld();
 }
 
@@ -43,13 +32,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
-   QMainWindow::resizeEvent(event);
+    QMainWindow::resizeEvent(event);
 
-   ui->lblDrawArea->move(5, 5);
-   ui->lblDrawArea->resize(size().width() - ui->btnTick->size().width() - 10, size().height() - 5);
-   ui->btnTick->move(ui->lblDrawArea->size().width() + 10, 5);
+    ui->lblDrawArea->move(5, 5);
+    ui->lblDrawArea->resize(size().width() - ui->grControls->size().width() - 10, size().height() - 5);
+    ui->grControls->move(ui->lblDrawArea->size().width() + 10, 5);
+    ui->grControls->resize(ui->grControls->size().width(), ui->lblDrawArea->size().height());
 
-   redrawWorld();
+    redrawWorld();
 }
 
 void MainWindow::redrawWorld()
@@ -67,7 +57,7 @@ void MainWindow::redrawWorld()
     QBrush background(Qt::darkGray, Qt::Dense4Pattern);
     painter.fillRect(fullArea, background);
 
-    painter.setRenderHint(QPainter::Antialiasing);
+    //painter.setRenderHint(QPainter::Antialiasing);
     painter.translate(translPoint);
     painter.scale(zoomLevel, zoomLevel);
 
@@ -120,10 +110,12 @@ void MainWindow::on_lblDrawArea_wheel(QWheelEvent *event)
 
 void MainWindow::on_lblDrawArea_mouseMove(QMouseEvent *event)
 {
+    QPoint mousePosition = event->pos();
+
     if (isPanning)
     {
         static QPoint lastPanDelta;
-        QPoint panDelta = event->pos() - panStartingPoint;
+        QPoint panDelta = mousePosition - panStartingPoint;
 
         if (lastPanDelta != panDelta)
         {
@@ -134,7 +126,41 @@ void MainWindow::on_lblDrawArea_mouseMove(QMouseEvent *event)
 
             lastPanDelta = panDelta;
         }
+    } else {
+        Cell *selectedCell = getCellFromFromPoint(mousePosition);
+        if (selectedCell == nullptr)
+        {
+            ui->lblTileInfo->setText("Selected tile: None");
+        } else {
+            const static char* terrainNames[] = { "Grass", "Water", "Mountain" };
+            ui->lblTileInfo->setText(QString("Selected tile: %1x%2\nTerrain: %3\nSun: %4\nRain: %5\nGrass: %6").
+                    arg(selectedCell->getPosition().x() + 1).arg(selectedCell->getPosition().y() + 1).
+                    arg(terrainNames[selectedCell->getTerrain()], QString::number(selectedCell->getSunLevel()),
+                                     QString::number(selectedCell->getRainLevel()),
+                                     QString::number(selectedCell->getGrassLevel())));
+        }
     }
+}
+
+Cell *MainWindow::getCellFromFromPoint(QPoint point)
+{
+    QTransform viewportTransform;
+    viewportTransform.translate(translPoint.x(), translPoint.y());
+    viewportTransform.scale(zoomLevel, zoomLevel);
+    viewportTransform = viewportTransform.inverted();
+
+    QPoint projectedPosition = viewportTransform.map(point);
+    if (projectedPosition.x() < 0 || projectedPosition.y() < 0)
+    {
+        return nullptr;
+    }
+    int tileX = projectedPosition.x() / 100, tileY = projectedPosition.y() / 100;
+    if (tileX >= world.getSize().width() || tileY >= world.getSize().height())
+    {
+        return nullptr;
+    }
+
+    return world.cellAt(tileX, tileY);
 }
 
 void MainWindow::on_lblDrawArea_mouseButtonPress(QMouseEvent *event)
@@ -162,6 +188,16 @@ void MainWindow::on_lblDrawArea_mouseButtonRelease(QMouseEvent *event)
 
 void MainWindow::on_btnTick_clicked()
 {
-    world.advance();
+    for (int i = 0; i < ui->spnTickCount->value(); i++)
+    {
+        world.advance();
+    }
+
+    redrawWorld();
+}
+
+void MainWindow::on_btnResize_clicked()
+{
+    world.resize(QSize(ui->spnWidth->value(), ui->spnHeight->value()));
     redrawWorld();
 }

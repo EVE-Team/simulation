@@ -21,7 +21,7 @@ void Cell::renderAt(QPainter &painter, QPoint pos) const
     switch (terrain)
     {
     case Terrain::Grass:
-        texure = ResourceManager::instance()->grassTexture();
+        texure = ResourceManager::instance()->grassTexture(grass);
         break;
     case Terrain::Mountain:
         texure = ResourceManager::instance()->rockTexture();
@@ -61,19 +61,39 @@ void Cell::setWeather(int sun, int rain)
 
     // При ливне солнца быть не может
     if (rain == 3)
-        sun = 0;
+    {
+        assert(sun == 0);
+    }
 
     // при жгучем солнце нет дождя
     if (sun == 3)
-        rain = 0;
+    {
+        assert(rain == 0);
+    }
 
     this->sun = sun; this->rain = rain;
 }
 
 void Cell::setRandomWeather()
 {
-    QRandomGenerator *gen = QRandomGenerator::global();
-    setWeather(gen->bounded(0, 4), gen->bounded(0, 4));
+    const int numOfWeatherCombinations = 11;
+    const static int weatherValues[numOfWeatherCombinations][2] = {
+            { 0, 0 },
+            { 0, 1 },
+            { 0, 2 },
+            { 0, 3 },
+            { 1, 0 },
+            { 1, 1 },
+            { 1, 2 },
+            { 2, 0 },
+            { 2, 1 },
+            { 2, 2 },
+            { 3, 0 }
+        };
+
+    QRandomGenerator *random = QRandomGenerator::global();
+    int weatherIndex = random->bounded(0, numOfWeatherCombinations + 1);
+    setWeather(weatherValues[weatherIndex][0], weatherValues[weatherIndex][1]);
 }
 
 void Cell::processGrass()
@@ -142,4 +162,24 @@ bool Cell::isNearWater() const
     }
 
     return false;
+}
+
+QPoint Cell::getPosition() const
+{
+    return QPoint(posX, posY);
+}
+
+int Cell::getSunLevel() const
+{
+    return sun;
+}
+
+int Cell::getRainLevel() const
+{
+    return rain;
+}
+
+int Cell::getGrassLevel() const
+{
+    return grass;
 }

@@ -1,11 +1,12 @@
 #include "world.h"
+#include "terraingenerator.h"
 #include <QVector>
 
 World::World(QSize size)
     : cells(size.width() * size.height(), Cell(this)),
       size(size)
 {
-    setCellsPositions();
+    rebuildWorld();
 }
 
 void World::render(QPainter &painter)
@@ -23,7 +24,7 @@ Cell *World::cellAt(int x, int y)
 {
     if (x >= 0 && y >= 0 && x < size.width() && y < size.height())
     {
-        return &cells[x * size.width() + y];
+        return &cells[y * size.width() + x];
     } else {
         return nullptr;
     }
@@ -31,9 +32,25 @@ Cell *World::cellAt(int x, int y)
 
 void World::resize(QSize newSize)
 {
+    int newElemCount = newSize.width() * newSize.height();
+    int numOfNewElements = newElemCount - cells.size();
+
     size = newSize;
-    cells.resize(size.width() * size.height());
-    setCellsPositions();
+    if (numOfNewElements < 0)
+    {
+        cells.resize(newElemCount);
+    } else if (numOfNewElements > 0) {
+        // avoid adding new elements with default constructor
+        cells.reserve(newElemCount);
+        for (int i = 0 ; i < numOfNewElements; i++)
+        {
+            cells.append(Cell(this));
+        }
+    }
+
+    assert(newElemCount == cells.size());
+
+    rebuildWorld();
 }
 
 QSize World::getSize() const
@@ -52,13 +69,21 @@ void World::advance()
     }
 }
 
-void World::setCellsPositions()
+void World::rebuildWorld()
 {
+    QVector<QVector<Cell::Terrain>> tgen = TerrainGenerator::generateTerrain(size);
+//    TerrainGenerator tgen(size);
+
+    // reset all cells
     for (int x = 0; x < size.width(); x++)
     {
         for (int y = 0; y < size.height(); y++)
         {
-            cellAt(x, y)->setPosition(x, y);
+            Cell *cell = cellAt(x, y);
+            *cell = Cell(this);
+            cell->setPosition(x, y);
+            cell->setTerrain(tgen[y][x]);
+//            cell->setTerrain(tgen.getTerrain(y, x));
         }
     }
 }

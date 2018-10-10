@@ -1,10 +1,15 @@
 <RCC>
     <qresource prefix="/images">
-        <file>grass.png</file>
+        <file>grass5.png</file>
         <file>rock.png</file>
         <file>water.png</file>
         <file>sun.png</file>
         <file>rain.png</file>
         <file>grass_icon.png</file>
+        <file>grass0.png</file>
+        <file>grass1.png</file>
+        <file>grass2.png</file>
+        <file>grass3.png</file>
+        <file>grass4.png</file>
     </qresource>
 </RCC>

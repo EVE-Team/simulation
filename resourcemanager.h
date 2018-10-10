@@ -8,7 +8,7 @@ class ResourceManager
 public:
     static ResourceManager *instance();
 
-    const QImage &grassTexture() const;
+    const QImage &grassTexture(int level) const;
     const QImage &waterTexture() const;
     const QImage &rockTexture() const;
 
@@ -21,7 +21,8 @@ private:
 
     static ResourceManager *m_instance;
 
-    QImage texGrass, texWater, texRock;
+    QImage texGrass[6];
+    QImage texWater, texRock;
     QImage iconSun, iconRain, iconGrass;
 };
 

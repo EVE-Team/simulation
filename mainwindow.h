@@ -28,8 +28,14 @@ protected:
 
     void redrawWorld();
 
+    // returns pointer to a cell located under specified point, or nullptr if there's no such cell
+    // point - coordinates of a point inside viewport (lblDrawArea)
+    Cell *getCellFromFromPoint(QPoint point);
+
 private slots:
     void on_btnTick_clicked();
+
+    void on_btnResize_clicked();
 
 private:
     Ui::MainWindow *ui;

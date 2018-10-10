@@ -16,9 +16,9 @@ protected:
     int width, height;
     QVector<QVector<Cell::Terrain>> terrain;
 private:
-    static const int GEN_STEP = 1024;
+    static const int GEN_STEP = 512;
     static const int RECT_SIZE = 4;
-    static const int Z_SCALE = 64;
+    static const int Z_SCALE = 40;
 
 };
 
