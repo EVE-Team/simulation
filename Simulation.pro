@@ -35,7 +35,9 @@ HEADERS += \
     cell.h \
     world.h \
     resourcemanager.h \
-    terraingenerator.h
+    terraingenerator.h \
+    terraingenerator.h \
+    world.h
 
 FORMS += \
         mainwindow.ui

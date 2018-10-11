@@ -71,7 +71,7 @@ void World::advance()
 
 void World::rebuildWorld()
 {
-    TerrainGenerator tgen(size);
+    QVector<QVector<Cell::Terrain>> tgen = TerrainGenerator::generateTerrain(size);
 
     // reset all cells
     for (int x = 0; x < size.width(); x++)
@@ -81,7 +81,7 @@ void World::rebuildWorld()
             Cell *cell = cellAt(x, y);
             *cell = Cell(this);
             cell->setPosition(x, y);
-            cell->setTerrain(tgen.getTerrain(y, x));
+            cell->setTerrain(tgen[y][x]);
         }
     }
 }
