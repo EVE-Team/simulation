@@ -74,6 +74,10 @@ void Rabbit::advance(int tickNumber)
         // couldn't find a cell to move to
         //qDebug() << "rabbit" << getId() << "died from hunger";
         die();
+        // prevent dead rabbits from reproducing
+        // TODO: separate eating into its own method (returns bool)
+        // TODO: currently the rabbit won't attempt to reproduce if it jumped to another cell
+        return;
     }
 
     // if there are 2 rabbits in a cell, they reproduce and third is added
