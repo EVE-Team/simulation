@@ -2,14 +2,22 @@
 #include "cell.h"
 #include "resourcemanager.h"
 #include "world.h"
+#include <QDebug>
 
+// cell size in pixels when rendered
 const int cellSize = 100;
+
+// minimum level of weather properties (sun and rain level)
+const int minWeather = 0, maxWeather = 3;
+const int minGrass = 0, maxGrass = 5;
+const int minRabbitCount = 0, maxRabbitCount = 3;
 
 Cell::Cell(World *parent)
     : terrain(Terrain::Grass),
       parent(parent),
-      sun(0), rain(0), grass(0)
+      sun(minWeather), rain(minWeather), grass(minGrass)
 {
+    rabbits.reserve(maxRabbitCount);
 }
 
 void Cell::renderAt(QPainter &painter, QPoint pos) const
@@ -36,6 +44,18 @@ void Cell::renderAt(QPainter &painter, QPoint pos) const
     painter.drawImage(QPoint(36, 1), ResourceManager::instance()->rainIcon());
     painter.drawImage(QPoint(63, 1), ResourceManager::instance()->grassIcon());
 
+    const int rc = getRabbitCount();
+    if (rc >= 1)
+    {
+        painter.drawImage(QPoint(2, 60), ResourceManager::instance()->rabbitIcon());
+    }
+    if (rc >= 2) {
+        painter.drawImage(QPoint(34, 60), ResourceManager::instance()->rabbitIcon());
+    }
+    if (rc >= 3) {
+        painter.drawImage(QPoint(66, 60), ResourceManager::instance()->rabbitIcon());
+    }
+
     painter.setPen(Qt::white);
     painter.drawText(QPoint(26, 13), QString::number(sun));
     painter.drawText(QPoint(52, 13), QString::number(rain));
@@ -56,19 +76,19 @@ void Cell::setTerrain(Terrain newTerrain)
 
 void Cell::setWeather(int sun, int rain)
 {
-    assert(sun >= 0 && sun <= 3);
-    assert(rain >= 0 && rain <= 3);
+    assert(sun >= minWeather && sun <= maxWeather);
+    assert(rain >= minWeather && rain <= maxWeather);
 
     // При ливне солнца быть не может
-    if (rain == 3)
+    if (rain == maxWeather)
     {
-        assert(sun == 0);
+        assert(sun == minWeather);
     }
 
     // при жгучем солнце нет дождя
-    if (sun == 3)
+    if (sun == maxWeather)
     {
-        assert(rain == 0);
+        assert(rain == minWeather);
     }
 
     this->sun = sun; this->rain = rain;
@@ -92,7 +112,7 @@ void Cell::setRandomWeather()
         };
 
     QRandomGenerator *random = QRandomGenerator::global();
-    int weatherIndex = random->bounded(0, numOfWeatherCombinations + 1);
+    int weatherIndex = random->bounded(0, numOfWeatherCombinations);
     setWeather(weatherValues[weatherIndex][0], weatherValues[weatherIndex][1]);
 }
 
@@ -101,16 +121,16 @@ void Cell::processGrass()
     // трава растет только если ландшафт - поле
     if (terrain != Terrain::Grass)
     {
-        grass = 0;
+        grass = minGrass;
         return;
     }
 
-    if (isNearWater() && sun > 0)
+    if (isNearWater() && sun > minWeather)
     {
         // Вокруг озера или реки трава растет всегда, когда есть солнце, даже если дождь не идет.
         grass++;
     }
-    else if ((rain == 0 && sun == 3) || (rain == 3 && sun == 0))
+    else if ((rain == minWeather && sun == maxWeather) || (rain == maxWeather && sun == minWeather))
     {
         // 3 (Ливень)    0 (Нет солнца)    Трава умирает
         // 0 (Нет дождя) 3 (Жгучее солнце) Высыхает трава
@@ -130,14 +150,19 @@ void Cell::processGrass()
         grass++;
     }
 
-    if (grass < 0) grass = 0;
-    if (grass > 5) grass = 5;
+    if (grass < minGrass) grass = minGrass;
+    if (grass > maxGrass) grass = maxGrass;
 }
 
-void Cell::advance()
+void Cell::advance(int tickNumber)
 {
     setRandomWeather();
     processGrass();
+
+    for (int i = 0; i < getRabbitCount(); i++)
+    {
+        rabbits[i].advance(tickNumber);
+    }
 }
 
 void Cell::setPosition(int x, int y)
@@ -147,16 +172,14 @@ void Cell::setPosition(int x, int y)
 
 bool Cell::isNearWater() const
 {
-    for (int x = posX - 1; x <= posX + 1; x++)
+    for (int x = -1; x <= 1; x++)
     {
-        for (int y = posY - 1; y <= posY + 1; y++)
+        for (int y = -1; y <= 1; y++)
         {
-            if (x >= 0 && y >= 0 && x < parent->getSize().width() && y < parent->getSize().height())
+            Cell *adjCell = getAdjacentCell(x, y);
+            if (adjCell != nullptr && adjCell->getTerrain() == Terrain::Water)
             {
-                if (parent->cellAt(x, y)->getTerrain() == Terrain::Water)
-                {
-                    return true;
-                }
+                return true;
             }
         }
     }
@@ -182,4 +205,66 @@ int Cell::getRainLevel() const
 int Cell::getGrassLevel() const
 {
     return grass;
+}
+
+Cell *Cell::getAdjacentCell(int dx, int dy) const
+{
+    auto pos = getPosition();
+    return getParent()->cellAt(pos.x() + dx, pos.y() + dy);
+}
+
+World *Cell::getParent() const
+{
+    return parent;
+}
+
+bool Cell::decreaseGrass()
+{
+    if (grass > minGrass)
+    {
+        grass--;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool Cell::rabbitCanMoveHere() const
+{
+    return (getRabbitCount() < maxRabbitCount) && (getGrassLevel() > minGrass);
+}
+
+bool Cell::addRabbit(const Rabbit &newRabbit)
+{
+    if (getRabbitCount() < maxRabbitCount)
+    {
+        rabbits.append(newRabbit);
+        //qDebug() << "setting parent for rabbit" << rabbits[rabbits.size() - 1].getId();
+        rabbits[rabbits.size() - 1].setParent(this);
+        //qDebug() << "added rabbit" << newRabbit.getId() << "to cell" << getPosition();
+        return true;
+    } else {
+        return false;
+    }
+}
+
+int Cell::getRabbitCount() const
+{
+    return rabbits.size();
+}
+
+bool Cell::removeRabbit(int id)
+{
+    for (int i = 0; i < getRabbitCount(); i++)
+    {
+        if (rabbits[i].getId() == id)
+        {
+            rabbits.remove(i);
+            //qDebug() << "rabbit with id" << id << "removed from cell" << getPosition();
+            return true;
+        }
+    }
+
+    qWarning() << "failed to remove - no rabbit with id" << id;
+    return false;
 }

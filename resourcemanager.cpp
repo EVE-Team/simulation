@@ -7,7 +7,8 @@ ResourceManager::ResourceManager()
       texRock(":/images/rock.png"),
       iconSun(":/images/sun.png"),
       iconRain(":/images/rain.png"),
-      iconGrass(":/images/grass_icon.png")
+      iconGrass(":/images/grass_icon.png"),
+      iconRabbit(":/images/rabbit.png")
 {
     for (int i = 0; i <= 5; i++)
     {
@@ -51,4 +52,9 @@ const QImage &ResourceManager::rainIcon() const
 const QImage &ResourceManager::grassIcon() const
 {
     return iconGrass;
+}
+
+const QImage &ResourceManager::rabbitIcon() const
+{
+    return iconRabbit;
 }

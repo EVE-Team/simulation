@@ -4,7 +4,7 @@
 
 World::World(QSize size)
     : cells(size.width() * size.height(), Cell(this)),
-      size(size)
+      size(size), tickNumber(0)
 {
     rebuildWorld();
 }
@@ -64,9 +64,11 @@ void World::advance()
     {
         for (int y = 0; y < size.height(); y++)
         {
-            cellAt(x, y)->advance();
+            cellAt(x, y)->advance(tickNumber);
         }
     }
+
+    tickNumber++;
 }
 
 void World::rebuildWorld()

@@ -16,6 +16,8 @@ public:
     const QImage &rainIcon() const;
     const QImage &grassIcon() const;
 
+    const QImage &rabbitIcon() const;
+
 private:
     ResourceManager();
 
@@ -24,6 +26,7 @@ private:
     QImage texGrass[6];
     QImage texWater, texRock;
     QImage iconSun, iconRain, iconGrass;
+    QImage iconRabbit;
 };
 
 #endif // RESOURCEMANAGER_H
