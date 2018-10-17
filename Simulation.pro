@@ -28,7 +28,8 @@ SOURCES += \
     cell.cpp \
     world.cpp \
     resourcemanager.cpp \
-    terraingenerator.cpp
+    terraingenerator.cpp \
+    rabbit.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -37,7 +38,8 @@ HEADERS += \
     resourcemanager.h \
     terraingenerator.h \
     terraingenerator.h \
-    world.h
+    world.h \
+    rabbit.h
 
 FORMS += \
         mainwindow.ui

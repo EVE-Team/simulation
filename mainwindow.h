@@ -37,6 +37,8 @@ private slots:
 
     void on_btnResize_clicked();
 
+    void on_btnAddRabbits_clicked();
+
 private:
     Ui::MainWindow *ui;
 

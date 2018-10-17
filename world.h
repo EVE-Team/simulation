@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QSize>
 #include "cell.h"
+#include "rabbit.h"
 
 class World
 {
@@ -26,6 +27,8 @@ protected:
     // called when the world is created or resized
     // resets all cells and generates new terrain
     void rebuildWorld();
+
+    int tickNumber;
 };
 
 #endif // WORLD_H

@@ -4,6 +4,8 @@
 #include <QDebug>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QMessageBox>
+#include <QRandomGenerator>
 
 const double zoomScaleFactor = 1.5;
 const QSize worldSize(3, 3); // default world size
@@ -64,6 +66,19 @@ void MainWindow::redrawWorld()
     world.render(painter);
 
     ui->lblDrawArea->setPixmap(renderBuffer);
+
+    //
+
+    int rabbitPopulation = 0;
+    for (int x = 0; x < world.getSize().width(); x++)
+    {
+        for (int y = 0 ; y < world.getSize().height(); y++)
+        {
+            rabbitPopulation += world.cellAt(x, y)->getRabbitCount();
+        }
+    }
+
+    ui->lblGlobalStats->setText(QString("%1 rabbits in total").arg(rabbitPopulation));
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
@@ -133,11 +148,12 @@ void MainWindow::on_lblDrawArea_mouseMove(QMouseEvent *event)
             ui->lblTileInfo->setText("Selected tile: None");
         } else {
             const static char* terrainNames[] = { "Grass", "Water", "Mountain" };
-            ui->lblTileInfo->setText(QString("Selected tile: %1x%2\nTerrain: %3\nSun: %4\nRain: %5\nGrass: %6").
+            ui->lblTileInfo->setText(QString("Selected tile: %1x%2\nTerrain: %3\nSun: %4; Rain: %5\nGrass: %6\nRabbits: %7").
                     arg(selectedCell->getPosition().x() + 1).arg(selectedCell->getPosition().y() + 1).
                     arg(terrainNames[selectedCell->getTerrain()], QString::number(selectedCell->getSunLevel()),
                                      QString::number(selectedCell->getRainLevel()),
-                                     QString::number(selectedCell->getGrassLevel())));
+                                     QString::number(selectedCell->getGrassLevel()),
+                                     QString::number(selectedCell->getRabbitCount())));
         }
     }
 }
@@ -167,7 +183,6 @@ void MainWindow::on_lblDrawArea_mouseButtonPress(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        //qDebug() << "button pressed";
         ui->lblDrawArea->setCursor(Qt::ClosedHandCursor);
 
         panStartingPoint = event->pos();
@@ -180,7 +195,6 @@ void MainWindow::on_lblDrawArea_mouseButtonRelease(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        //qDebug() << "button released";
         ui->lblDrawArea->setCursor(Qt::OpenHandCursor);
         isPanning = false;
     }
@@ -199,5 +213,52 @@ void MainWindow::on_btnTick_clicked()
 void MainWindow::on_btnResize_clicked()
 {
     world.resize(QSize(ui->spnWidth->value(), ui->spnHeight->value()));
+    redrawWorld();
+}
+
+void MainWindow::on_btnAddRabbits_clicked()
+{
+    const int world_w = world.getSize().width(), world_h = world.getSize().height();
+    int maxNumberOfRabbitsToAdd = 0;
+
+    for (int x = 0; x < world_w; x++)
+    {
+        for (int y = 0; y < world_h; y++)
+        {
+            Cell *cell = world.cellAt(x, y);
+            if (cell->getTerrain() == Cell::Terrain::Grass)
+            {
+                maxNumberOfRabbitsToAdd += 3 - cell->getRabbitCount();
+            }
+        }
+    }
+
+    //qDebug() << "can add up to" << maxNumberOfRabbitsToAdd << "rabbits";
+
+    int numOfRabbitsToAdd = ui->spnRabbitCount->value();
+
+    if (numOfRabbitsToAdd > maxNumberOfRabbitsToAdd)
+    {
+        QMessageBox msgbox;
+        msgbox.setText(QString("%1 out of %2 rabbits will be added due to space limitations").arg(maxNumberOfRabbitsToAdd).arg(numOfRabbitsToAdd));
+        msgbox.setIcon(QMessageBox::Warning);
+        msgbox.exec();
+
+        numOfRabbitsToAdd = maxNumberOfRabbitsToAdd;
+    }
+
+    QRandomGenerator *random = QRandomGenerator::global();
+    do {
+        int xpos = random->bounded(0, world_w), ypos = random->bounded(0, world_h);
+        Cell *cell = world.cellAt(xpos, ypos);
+        if (cell->getTerrain() == Cell::Terrain::Grass)
+        {
+            if (cell->addRabbit(Rabbit()))
+            {
+                numOfRabbitsToAdd--;
+            }
+        }
+    } while (numOfRabbitsToAdd > 0);
+
     redrawWorld();
 }
