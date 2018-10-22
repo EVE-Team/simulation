@@ -17,7 +17,10 @@ Cell::Cell(World *parent)
       parent(parent),
       sun(minWeather), rain(minWeather), grass(minGrass)
 {
-    rabbits.reserve(maxRabbitCount);
+    for (int crtype = 0; crtype < NO_OF_CREATURE_TYPES; crtype++)
+    {
+        creatures[crtype].reserve(maxRabbitCount);
+    }
 }
 
 void Cell::renderAt(QPainter &painter, QPoint pos) const
@@ -159,9 +162,12 @@ void Cell::advance(int tickNumber)
     setRandomWeather();
     processGrass();
 
-    for (int i = 0; i < getRabbitCount(); i++)
+    for (int crtype = 0; crtype < NO_OF_CREATURE_TYPES; crtype++)
     {
-        rabbits[i].advance(tickNumber);
+        for (int i = 0; i < creatures[crtype].size(); i++)
+        {
+            creatures[crtype][i]->advance(tickNumber);
+        }
     }
 }
 
@@ -234,37 +240,54 @@ bool Cell::rabbitCanMoveHere() const
     return (getRabbitCount() < maxRabbitCount) && (getGrassLevel() > minGrass);
 }
 
-bool Cell::addRabbit(const Rabbit &newRabbit)
+bool Cell::addCreature(Creature *newCreature)
 {
-    if (getRabbitCount() < maxRabbitCount)
+    if (getCreatureCount(newCreature->getType()) < maxRabbitCount)
     {
-        rabbits.append(newRabbit);
-        //qDebug() << "setting parent for rabbit" << rabbits[rabbits.size() - 1].getId();
-        rabbits[rabbits.size() - 1].setParent(this);
-        //qDebug() << "added rabbit" << newRabbit.getId() << "to cell" << getPosition();
+        newCreature->setParent(this);
+        creatures[newCreature->getType()].append(newCreature);
         return true;
     } else {
+        qWarning() << "add creature failed due to space constraints";
         return false;
     }
 }
 
 int Cell::getRabbitCount() const
 {
-    return rabbits.size();
+    return getCreatureCount(CREATURE_TYPE_RABBIT);
 }
 
-bool Cell::removeRabbit(int id)
+int Cell::getCreatureCount(int creatureType) const
 {
-    for (int i = 0; i < getRabbitCount(); i++)
+    return creatures[creatureType].size();
+}
+
+bool Cell::disownCreature(Creature *creature)
+{
+    const int cr_id = creature->getId(), cr_type = creature->getType();
+
+    for (int i = 0; i < creatures[cr_type].size(); i++)
     {
-        if (rabbits[i].getId() == id)
+        if (creatures[cr_type][i]->getId() == cr_id)
         {
-            rabbits.remove(i);
-            //qDebug() << "rabbit with id" << id << "removed from cell" << getPosition();
+            creatures[cr_type].remove(i);
+            creature->setParent(nullptr);
             return true;
         }
     }
 
-    qWarning() << "failed to remove - no rabbit with id" << id;
+    qWarning() << "failed to remove - no creature with id" << cr_id;
     return false;
+}
+
+bool Cell::killCreature(Creature *creature)
+{
+    if (disownCreature(creature))
+    {
+        delete creature;
+        return true;
+    } else {
+        return false;
+    }
 }

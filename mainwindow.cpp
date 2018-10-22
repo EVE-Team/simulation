@@ -253,7 +253,7 @@ void MainWindow::on_btnAddRabbits_clicked()
         Cell *cell = world.cellAt(xpos, ypos);
         if (cell->getTerrain() == Cell::Terrain::Grass)
         {
-            if (cell->addRabbit(Rabbit()))
+            if (cell->addCreature(new Rabbit()))
             {
                 numOfRabbitsToAdd--;
             }

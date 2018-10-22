@@ -1,28 +1,23 @@
 #pragma once
 
-class Cell;
+#include "creature.h"
 
-class Rabbit
+#define CREATURE_TYPE_RABBIT 0
+
+class Rabbit : public Creature
 {
 public:
     Rabbit();
 
-    int getId() const;
-
-    void setParent(Cell *newParent);
-    Cell *getParent() const;
-
-    // move this rabbit one tick forward in time
-    void advance(int tickNumber);
-
-    // remove itself from parent cell
-    void die();
-
-    // remove itself to another cell
-    void moveTo(Cell *newCell);
+    virtual int getType() const;
+    virtual QString getSpecies() const;
+    virtual void advanceImpl();
 
 protected:
-    Cell *parent;
-    int id;
-    int lastTick;
+    // attempts to eat one unit of grass
+    // if there's no grass in current cell, will jump to adjacent
+    // cell that has any and eat from new cell
+    // returns true if rabbit has successfully eaten
+    // returns false if rabbit strved to death (and we should call die())
+    bool eatGrass();
 };
