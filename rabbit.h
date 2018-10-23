@@ -20,4 +20,7 @@ protected:
     // returns true if rabbit has successfully eaten
     // returns false if rabbit strved to death (and we should call die())
     bool eatGrass();
+
+    // used in finding new cell to jump to
+    static bool newCellConditionChecker(Cell *cell);
 };

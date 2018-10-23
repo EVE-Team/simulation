@@ -235,11 +235,6 @@ bool Cell::decreaseGrass()
     }
 }
 
-bool Cell::rabbitCanMoveHere() const
-{
-    return (getRabbitCount() < maxRabbitCount) && (getGrassLevel() > minGrass);
-}
-
 bool Cell::addCreature(Creature *newCreature)
 {
     if (getCreatureCount(newCreature->getType()) < maxRabbitCount)

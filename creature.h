@@ -25,20 +25,29 @@ public:
 
     // move this creature one tick forward in time
     void advance(int tickNumber);
+
+protected:
+
+    Cell *parent;
+    int id;
+    int lastTick;
+
     // actual implementation of advance, after tickNumber check
     virtual void advanceImpl() = 0;
 
     // remove ourselves from parent cell
+    // this frees memory allocated for this instance of creature
     void die();
 
     // move to a different cell
     // works by copying ourselves to newCell and removing ourselves from current cell
     void moveTo(Cell *newCell);
 
-protected:
-    Cell *parent;
-    int id;
-    int lastTick;
+    // searches 8 adjacent cells in random order, passing them to callback
+    // returns pointer to first cell for which callback returned true
+    // returns nullptr if callback returned false for all cells
+    typedef bool (*CellConditionFunct)(Cell *cell);
+    Cell *findAdjacentCellByCondition(CellConditionFunct callback) const;
 };
 
 #endif // CREATURE_H

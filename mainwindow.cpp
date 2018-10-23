@@ -81,6 +81,9 @@ void MainWindow::redrawWorld()
     ui->lblGlobalStats->setText(QString("%1 rabbits in total").arg(rabbitPopulation));
 }
 
+// ignore "enumeration value '...' not handled in switch' warning
+#pragma GCC diagnostic ignored "-Wswitch"
+
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
     if (obj == ui->lblDrawArea)

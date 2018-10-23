@@ -10,6 +10,11 @@ class World;
 // assume there are 2 creature types for now
 #define NO_OF_CREATURE_TYPES 2
 
+extern const int maxRabbitCount, minGrass;
+
+// ignore initialization reorder warnings
+#pragma GCC diagnostic ignored "-Wreorder"
+
 class Cell
 {
 public:
@@ -58,11 +63,6 @@ public:
     // move this cell one tick forward in time
     // (set random weather, process grass, process rabbits)
     void advance(int tickNumber);
-
-    // returns true if this cell has grass and space for another rabbit
-    // always returns false for cells with water and mountain landscape
-    // TODO: move to rabbit class
-    bool rabbitCanMoveHere() const;
 
     // adds new creature to this cell
     // returns true on success

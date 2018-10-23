@@ -1,3 +1,4 @@
+#include <QRandomGenerator>
 #include "creature.h"
 #include "cell.h"
 
@@ -57,4 +58,38 @@ void Creature::moveTo(Cell *newCell)
     assert(getParent()->disownCreature(this));
     // assign ourselves to new cell
     assert(newCell->addCreature(this));
+}
+
+Cell *Creature::findAdjacentCellByCondition(CellConditionFunct callback) const
+{
+    // randomize search direction
+    int x_start = -1, x_end = 1, x_dir = 1;
+    int y_start = -1, y_end = 1, y_dir = 1;
+    QRandomGenerator *random = QRandomGenerator::global();
+    if (random->bounded(0, 2))
+    {
+        x_start = -x_start; x_end = -x_end; x_dir = -x_dir;
+    }
+    if (random->bounded(0, 2))
+    {
+        y_start = -y_start; y_end = -y_end; y_dir = -y_dir;
+    }
+
+    // search adjacent cells
+    for (int x = x_start; x_end == 1 ? x <= x_end : x >= x_end; x+=x_dir)
+    {
+        for (int y = y_start; y_end == 1 ? y <= y_end : y >= y_end; y+=y_dir)
+        {
+            if (!(x == 0 && y == 0))
+            {
+                Cell *newCell = getParent()->getAdjacentCell(x, y);
+                if (newCell != nullptr && callback(newCell))
+                {
+                    return newCell;
+                }
+            }
+        }
+    }
+
+    return nullptr;
 }
