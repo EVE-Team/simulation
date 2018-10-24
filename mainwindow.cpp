@@ -221,10 +221,10 @@ void MainWindow::on_btnResize_clicked()
     redrawWorld();
 }
 
-void MainWindow::on_btnAddRabbits_clicked()
+void MainWindow::addCreatures(int creatureType, int count)
 {
     const int world_w = world.getSize().width(), world_h = world.getSize().height();
-    int maxNumberOfRabbitsToAdd = 0;
+    int maxNumberOfCreaturesToAdd = 0;
 
     for (int x = 0; x < world_w; x++)
     {
@@ -233,24 +233,24 @@ void MainWindow::on_btnAddRabbits_clicked()
             Cell *cell = world.cellAt(x, y);
             if (cell->getTerrain() == Cell::Terrain::Grass)
             {
-                maxNumberOfRabbitsToAdd += 3 - cell->getRabbitCount();
+                maxNumberOfCreaturesToAdd += 3 - cell->getCreatureCount(creatureType);
             }
         }
     }
 
-    //qDebug() << "can add up to" << maxNumberOfRabbitsToAdd << "rabbits";
+    //
 
-    int numOfRabbitsToAdd = ui->spnRabbitCount->value();
-
-    if (numOfRabbitsToAdd > maxNumberOfRabbitsToAdd)
+    if (count > maxNumberOfCreaturesToAdd)
     {
         QMessageBox msgbox;
-        msgbox.setText(QString("%1 out of %2 rabbits will be added due to space limitations").arg(maxNumberOfRabbitsToAdd).arg(numOfRabbitsToAdd));
+        msgbox.setText(QString("%1 out of %2 creatures will be added due to space limitations").arg(maxNumberOfCreaturesToAdd).arg(count));
         msgbox.setIcon(QMessageBox::Warning);
         msgbox.exec();
 
-        numOfRabbitsToAdd = maxNumberOfRabbitsToAdd;
+        count = maxNumberOfCreaturesToAdd;
     }
+
+    //
 
     QRandomGenerator *random = QRandomGenerator::global();
     do {
@@ -258,18 +258,39 @@ void MainWindow::on_btnAddRabbits_clicked()
         Cell *cell = world.cellAt(xpos, ypos);
         if (cell->getTerrain() == Cell::Terrain::Grass)
         {
-            if (cell->addCreature(new Rabbit()))
+            if (cell->getCreatureCount(creatureType) < 3)
             {
-                numOfRabbitsToAdd--;
+                Creature *newCreature;
+
+                switch (creatureType)
+                {
+                case CREATURE_TYPE_RABBIT:
+                    newCreature = new Rabbit();
+                    break;
+                case CREATURE_TYPE_HUNTER:
+                    newCreature = new Hunter();
+                    break;
+                default:
+                    abort();
+                }
+
+                assert(cell->addCreature(newCreature));
+                count--;
             }
         }
-    } while (numOfRabbitsToAdd > 0);
+    } while (count > 0);
+
+    //
 
     redrawWorld();
 }
 
+void MainWindow::on_btnAddRabbits_clicked()
+{
+    addCreatures(CREATURE_TYPE_RABBIT, ui->spnRabbitCount->value());
+}
+
 void MainWindow::on_btnAddHunters_clicked()
 {
-    world.cellAt(0, 0)->addCreature(new Hunter());
-    redrawWorld();
+    addCreatures(CREATURE_TYPE_HUNTER, ui->spnHunterCount->value());
 }

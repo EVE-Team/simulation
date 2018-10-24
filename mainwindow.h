@@ -32,6 +32,8 @@ protected:
     // point - coordinates of a point inside viewport (lblDrawArea)
     Cell *getCellFromFromPoint(QPoint point);
 
+    void addCreatures(int creatureType, int count);
+
 private slots:
     void on_btnTick_clicked();
 
