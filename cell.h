@@ -68,6 +68,8 @@ public:
     // returns true on success
     // returns false if there's no room for more creatures of this type
     bool addCreature(Creature *newCreature);
+    //
+    Creature *getCreature(int type, int index) const;
 
     // number of creatures living in this cell (0-3)
     int getCreatureCount(int creatureType) const;
@@ -101,6 +103,8 @@ protected:
 
     // rabbits living on this cell (0-3)
     QVector<Creature*> creatures[NO_OF_CREATURE_TYPES];
+
+    static void drawCreature(QPainter &painter, int count, int verticalPosition, const QImage &icon);
 };
 
 #endif // CELL_H

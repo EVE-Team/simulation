@@ -13,6 +13,12 @@ public:
     virtual int getType() const;
     virtual QString getSpecies() const;
     virtual void advanceImpl();
+
+protected:
+    bool eatRabbit(Cell *cell);
+
+    // used in finding new cell to jump to
+    static bool hasRabbitsCondition(Cell *cell);
 };
 
 #endif // HUNTER_H

@@ -6,6 +6,7 @@
 #include <QWheelEvent>
 #include <QMessageBox>
 #include <QRandomGenerator>
+#include "hunter.h"
 
 const double zoomScaleFactor = 1.5;
 const QSize worldSize(3, 3); // default world size
@@ -151,12 +152,13 @@ void MainWindow::on_lblDrawArea_mouseMove(QMouseEvent *event)
             ui->lblTileInfo->setText("Selected tile: None");
         } else {
             const static char* terrainNames[] = { "Grass", "Water", "Mountain" };
-            ui->lblTileInfo->setText(QString("Selected tile: %1x%2\nTerrain: %3\nSun: %4; Rain: %5\nGrass: %6\nRabbits: %7").
+            ui->lblTileInfo->setText(QString("Selected tile: %1x%2\nTerrain: %3\nSun: %4; Rain: %5\nGrass: %6\nRabbits: %7\nHunters: %8").
                     arg(selectedCell->getPosition().x() + 1).arg(selectedCell->getPosition().y() + 1).
                     arg(terrainNames[selectedCell->getTerrain()], QString::number(selectedCell->getSunLevel()),
                                      QString::number(selectedCell->getRainLevel()),
                                      QString::number(selectedCell->getGrassLevel()),
-                                     QString::number(selectedCell->getRabbitCount())));
+                                     QString::number(selectedCell->getRabbitCount()),
+                                     QString::number(selectedCell->getCreatureCount(CREATURE_TYPE_HUNTER))));
         }
     }
 }
@@ -263,5 +265,11 @@ void MainWindow::on_btnAddRabbits_clicked()
         }
     } while (numOfRabbitsToAdd > 0);
 
+    redrawWorld();
+}
+
+void MainWindow::on_btnAddHunters_clicked()
+{
+    world.cellAt(0, 0)->addCreature(new Hunter());
     redrawWorld();
 }

@@ -1,6 +1,7 @@
 #include <QRandomGenerator>
 #include "creature.h"
 #include "cell.h"
+#include <QDebug>
 
 Creature::Creature()
     : parent(nullptr),

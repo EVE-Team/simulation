@@ -39,6 +39,8 @@ private slots:
 
     void on_btnAddRabbits_clicked();
 
+    void on_btnAddHunters_clicked();
+
 private:
     Ui::MainWindow *ui;
 

@@ -3,6 +3,7 @@
 #include "resourcemanager.h"
 #include "world.h"
 #include <QDebug>
+#include "hunter.h"
 
 // cell size in pixels when rendered
 const int cellSize = 100;
@@ -20,6 +21,20 @@ Cell::Cell(World *parent)
     for (int crtype = 0; crtype < NO_OF_CREATURE_TYPES; crtype++)
     {
         creatures[crtype].reserve(maxRabbitCount);
+    }
+}
+
+void Cell::drawCreature(QPainter &painter, int count, int verticalPosition, const QImage &icon)
+{
+    if (count >= 1)
+    {
+        painter.drawImage(QPoint(2, verticalPosition), icon);
+    }
+    if (count >= 2) {
+        painter.drawImage(QPoint(34, verticalPosition), icon);
+    }
+    if (count >= 3) {
+        painter.drawImage(QPoint(66, verticalPosition), icon);
     }
 }
 
@@ -47,17 +62,8 @@ void Cell::renderAt(QPainter &painter, QPoint pos) const
     painter.drawImage(QPoint(36, 1), ResourceManager::instance()->rainIcon());
     painter.drawImage(QPoint(63, 1), ResourceManager::instance()->grassIcon());
 
-    const int rc = getRabbitCount();
-    if (rc >= 1)
-    {
-        painter.drawImage(QPoint(2, 60), ResourceManager::instance()->rabbitIcon());
-    }
-    if (rc >= 2) {
-        painter.drawImage(QPoint(34, 60), ResourceManager::instance()->rabbitIcon());
-    }
-    if (rc >= 3) {
-        painter.drawImage(QPoint(66, 60), ResourceManager::instance()->rabbitIcon());
-    }
+    drawCreature(painter, getRabbitCount(), 68, ResourceManager::instance()->rabbitIcon());
+    drawCreature(painter, getCreatureCount(CREATURE_TYPE_HUNTER), 35, ResourceManager::instance()->hunterIcon());
 
     painter.setPen(Qt::white);
     painter.drawText(QPoint(26, 13), QString::number(sun));
@@ -164,9 +170,17 @@ void Cell::advance(int tickNumber)
 
     for (int crtype = 0; crtype < NO_OF_CREATURE_TYPES; crtype++)
     {
-        for (int i = 0; i < creatures[crtype].size(); i++)
+        int lastSize = creatures[crtype].size();
+        for (int i = 0; i < lastSize; i++)
         {
             creatures[crtype][i]->advance(tickNumber);
+
+            if (creatures[crtype].size() < lastSize)
+            {
+                // one of creatures died
+                lastSize = creatures[crtype].size();
+                i--;
+            }
         }
     }
 }
@@ -284,5 +298,15 @@ bool Cell::killCreature(Creature *creature)
         return true;
     } else {
         return false;
+    }
+}
+
+Creature *Cell::getCreature(int type, int index) const
+{
+    if (type < NO_OF_CREATURE_TYPES && index < creatures[type].size())
+    {
+        return creatures[type][index];
+    } else {
+        return nullptr;
     }
 }
