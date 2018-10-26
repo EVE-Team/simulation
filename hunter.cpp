@@ -26,19 +26,23 @@ void Hunter::advanceImpl()
         return;
     }
 
-    // no rebbits in current cell
+    // no rabbits in current cell
+    // try to find something to eat in adjacent cells
     Cell *newCell = findAdjacentCellByCondition(hasRabbitsCondition);
     if (newCell)
     {
         moveTo(newCell);
         assert(eatRabbit(newCell));
     } else {
-        // no food
-        die();
+        // don't sit in one place if there's nothing to eat
+        jumpToRandomAdjacentCell();
     }
 }
 
-bool Hunter::hasRabbitsCondition(Cell *cell)
+// ignore "unused parameter ‘argument’" warning
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+bool Hunter::hasRabbitsCondition(Cell *cell, int argument)
 {
     return cell->getRabbitCount() > 0;
 }

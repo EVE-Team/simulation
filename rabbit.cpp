@@ -32,7 +32,10 @@ void Rabbit::advanceImpl()
     }
 }
 
-bool Rabbit::newCellConditionChecker(Cell *cell)
+// ignore "unused parameter ‘argument’" warning
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+bool Rabbit::newCellConditionChecker(Cell *cell, int argument)
 {
     return (cell->getRabbitCount() < maxRabbitCount) && (cell->getGrassLevel() > minGrass);
 }

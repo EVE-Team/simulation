@@ -61,7 +61,7 @@ void Creature::moveTo(Cell *newCell)
     assert(newCell->addCreature(this));
 }
 
-Cell *Creature::findAdjacentCellByCondition(CellConditionFunct callback) const
+Cell *Creature::findAdjacentCellByCondition(CellConditionFunct callback, int argument) const
 {
     // randomize search direction
     int x_start = -1, x_end = 1, x_dir = 1;
@@ -84,7 +84,7 @@ Cell *Creature::findAdjacentCellByCondition(CellConditionFunct callback) const
             if (!(x == 0 && y == 0))
             {
                 Cell *newCell = getParent()->getAdjacentCell(x, y);
-                if (newCell != nullptr && callback(newCell))
+                if (newCell != nullptr && callback(newCell, argument))
                 {
                     return newCell;
                 }
@@ -93,4 +93,23 @@ Cell *Creature::findAdjacentCellByCondition(CellConditionFunct callback) const
     }
 
     return nullptr;
+}
+
+bool Creature::randomCellConditionChecker(Cell *cell, int argument)
+{
+    return (cell->getTerrain() == Cell::Terrain::Grass) && (cell->getCreatureCount(argument) < 3);
+}
+
+bool Creature::jumpToRandomAdjacentCell()
+{
+    // findAdjacentCellByCondition doesn't return strictly random cell, it prefers cells at corners
+    // but close enough
+    Cell *newCell = findAdjacentCellByCondition(randomCellConditionChecker, getType());
+    if (newCell)
+    {
+        moveTo(newCell);
+        return true;
+    } else {
+        return false;
+    }
 }

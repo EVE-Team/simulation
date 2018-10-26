@@ -22,5 +22,5 @@ protected:
     bool eatGrass();
 
     // used in finding new cell to jump to
-    static bool newCellConditionChecker(Cell *cell);
+    static bool newCellConditionChecker(Cell *cell, int argument);
 };

@@ -27,7 +27,6 @@ public:
     void advance(int tickNumber);
 
 protected:
-
     Cell *parent;
     int id;
     int lastTick;
@@ -46,8 +45,16 @@ protected:
     // searches 8 adjacent cells in random order, passing them to callback
     // returns pointer to first cell for which callback returned true
     // returns nullptr if callback returned false for all cells
-    typedef bool (*CellConditionFunct)(Cell *cell);
-    Cell *findAdjacentCellByCondition(CellConditionFunct callback) const;
+    // argument - optional argument that will be passed to callback function
+    typedef bool (*CellConditionFunct)(Cell *cell, int argument);
+    Cell *findAdjacentCellByCondition(CellConditionFunct callback, int argument = 0) const;
+
+    // jump to a random adjacent cell that has grassy terrain and space for
+    // creature of our type
+    // returns true on success, false if remained in the same cell
+    bool jumpToRandomAdjacentCell();
+    // for jumpToRandomAdjacentCell()
+    static bool randomCellConditionChecker(Cell *cell, int argument);
 };
 
 #endif // CREATURE_H

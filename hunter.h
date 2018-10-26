@@ -18,7 +18,7 @@ protected:
     bool eatRabbit(Cell *cell);
 
     // used in finding new cell to jump to
-    static bool hasRabbitsCondition(Cell *cell);
+    static bool hasRabbitsCondition(Cell *cell, int argument);
 };
 
 #endif // HUNTER_H
