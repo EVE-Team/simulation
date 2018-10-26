@@ -11,6 +11,9 @@
 const double zoomScaleFactor = 1.5;
 const QSize worldSize(3, 3); // default world size
 
+const QColor selectedCellBorderColor = QColor(46, 215, 244);
+const qreal selectedCellBorderWidth = 3.5;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -68,6 +71,15 @@ void MainWindow::redrawWorld()
     painter.scale(zoomLevel, zoomLevel);
 
     world.render(painter);
+
+    // mark selected (watched) cell
+    if (watchedCell != nullptr)
+    {
+        const QPoint pos = watchedCell->getPosition() * 100;
+
+        painter.setPen(QPen(QBrush(selectedCellBorderColor), selectedCellBorderWidth, Qt::PenStyle::DashLine));
+        painter.drawRect(pos.x(), pos.y(), 100, 100);
+    }
 
     ui->lblDrawArea->setPixmap(renderBuffer);
 
@@ -199,7 +211,7 @@ void MainWindow::on_lblDrawArea_mouseButtonPress(QMouseEvent *event)
         isPanning = true;
     } else if (event->button() == Qt::RightButton) {
         watchedCell = getCellFromFromPoint(mousePosition);
-        updateWatchedCell();
+        redrawWorld();
     }
 }
 
