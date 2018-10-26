@@ -16,7 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     zoomLevel(1.0),
     isPanning(false),
-    world(worldSize)
+    world(worldSize),
+    watchedCell(nullptr)
 {
     ui->setupUi(this);
     qApp->installEventFilter(this);
@@ -47,6 +48,8 @@ void MainWindow::resizeEvent(QResizeEvent* event)
 
 void MainWindow::redrawWorld()
 {
+    // render world
+
     const QSize renderAreaSize = ui->lblDrawArea->size();
     if (renderBuffer.size() != renderAreaSize)
     {
@@ -68,11 +71,15 @@ void MainWindow::redrawWorld()
 
     ui->lblDrawArea->setPixmap(renderBuffer);
 
-    //
+    // update total count of creatures
 
     ui->lblGlobalStats->setText(QString("%1 rabbits in total\n%2 hunters in total").
                                 arg(world.getCreaturePopulation(CREATURE_TYPE_RABBIT)).
                                 arg(world.getCreaturePopulation(CREATURE_TYPE_HUNTER)));
+
+    // update info on selected cell
+
+    updateWatchedCell();
 }
 
 // ignore "enumeration value '...' not handled in switch' warning
@@ -122,7 +129,7 @@ void MainWindow::on_lblDrawArea_wheel(QWheelEvent *event)
 
 void MainWindow::on_lblDrawArea_mouseMove(QMouseEvent *event)
 {
-    QPoint mousePosition = event->pos();
+    const QPoint mousePosition = event->pos();
 
     if (isPanning)
     {
@@ -138,21 +145,23 @@ void MainWindow::on_lblDrawArea_mouseMove(QMouseEvent *event)
 
             lastPanDelta = panDelta;
         }
+    }
+}
+
+void MainWindow::updateWatchedCell()
+{
+    if (watchedCell == nullptr)
+    {
+        ui->lblTileInfo->setText("Selected tile: None");
     } else {
-        Cell *selectedCell = getCellFromFromPoint(mousePosition);
-        if (selectedCell == nullptr)
-        {
-            ui->lblTileInfo->setText("Selected tile: None");
-        } else {
-            const static char* terrainNames[] = { "Grass", "Water", "Mountain" };
-            ui->lblTileInfo->setText(QString("Selected tile: %1x%2\nTerrain: %3\nSun: %4; Rain: %5\nGrass: %6\nRabbits: %7\nHunters: %8").
-                    arg(selectedCell->getPosition().x() + 1).arg(selectedCell->getPosition().y() + 1).
-                    arg(terrainNames[selectedCell->getTerrain()], QString::number(selectedCell->getSunLevel()),
-                                     QString::number(selectedCell->getRainLevel()),
-                                     QString::number(selectedCell->getGrassLevel()),
-                                     QString::number(selectedCell->getRabbitCount()),
-                                     QString::number(selectedCell->getCreatureCount(CREATURE_TYPE_HUNTER))));
-        }
+        const static char* terrainNames[] = { "Grass", "Water", "Mountain" };
+        ui->lblTileInfo->setText(QString("Selected tile: %1x%2\nTerrain: %3\nSun: %4; Rain: %5\nGrass: %6\nRabbits: %7\nHunters: %8").
+                arg(watchedCell->getPosition().x() + 1).arg(watchedCell->getPosition().y() + 1).
+                arg(terrainNames[watchedCell->getTerrain()], QString::number(watchedCell->getSunLevel()),
+                                 QString::number(watchedCell->getRainLevel()),
+                                 QString::number(watchedCell->getGrassLevel()),
+                                 QString::number(watchedCell->getRabbitCount()),
+                                 QString::number(watchedCell->getCreatureCount(CREATURE_TYPE_HUNTER))));
     }
 }
 
@@ -179,13 +188,18 @@ Cell *MainWindow::getCellFromFromPoint(QPoint point)
 
 void MainWindow::on_lblDrawArea_mouseButtonPress(QMouseEvent *event)
 {
+    const QPoint mousePosition = event->pos();
+
     if (event->button() == Qt::LeftButton)
     {
         ui->lblDrawArea->setCursor(Qt::ClosedHandCursor);
 
-        panStartingPoint = event->pos();
+        panStartingPoint = mousePosition;
         translOnPanStart = translPoint;
         isPanning = true;
+    } else if (event->button() == Qt::RightButton) {
+        watchedCell = getCellFromFromPoint(mousePosition);
+        updateWatchedCell();
     }
 }
 

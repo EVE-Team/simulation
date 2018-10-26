@@ -31,6 +31,10 @@ protected:
     // returns pointer to a cell located under specified point, or nullptr if there's no such cell
     // point - coordinates of a point inside viewport (lblDrawArea)
     Cell *getCellFromFromPoint(QPoint point);
+    // user can select a cell to 'watch' it
+    // this updates info on such cell
+    // celled from redrawWorld()
+    void updateWatchedCell();
 
     void addCreatures(int creatureType, int count);
 
@@ -56,6 +60,8 @@ private:
     QPoint translOnPanStart;
 
     World world;
+
+    Cell *watchedCell;
 };
 
 #endif // MAINWINDOW_H
