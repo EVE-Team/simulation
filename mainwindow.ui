@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>816</width>
-    <height>488</height>
+    <width>745</width>
+    <height>553</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,7 +39,7 @@
       <x>530</x>
       <y>10</y>
       <width>161</width>
-      <height>441</height>
+      <height>451</height>
      </rect>
     </property>
     <property name="title">
@@ -161,9 +161,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>310</y>
+       <y>370</y>
        <width>141</width>
-       <height>101</height>
+       <height>111</height>
       </rect>
      </property>
      <property name="text">
@@ -209,7 +209,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>250</y>
+       <y>290</y>
        <width>118</width>
        <height>3</height>
       </rect>
@@ -222,7 +222,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>300</y>
+       <y>360</y>
        <width>118</width>
        <height>3</height>
       </rect>
@@ -235,14 +235,15 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>260</y>
+       <y>300</y>
        <width>141</width>
-       <height>41</height>
+       <height>51</height>
       </rect>
      </property>
      <property name="text">
       <string>0 rabbits in total
-0 hunters in total</string>
+0 hunters in total
+0 wolves in total</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -264,7 +265,7 @@
       <number>1000</number>
      </property>
      <property name="value">
-      <number>10</number>
+      <number>3</number>
      </property>
     </widget>
     <widget class="QPushButton" name="btnAddHunters">
@@ -278,6 +279,38 @@
      </property>
      <property name="text">
       <string>Add hunters</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btnAddWolves">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>250</y>
+       <width>83</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Add wolves</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="spnWolfCount">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>250</y>
+       <width>49</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>1000</number>
+     </property>
+     <property name="value">
+      <number>1</number>
      </property>
     </widget>
    </widget>

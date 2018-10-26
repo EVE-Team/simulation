@@ -31,7 +31,8 @@ SOURCES += \
     terraingenerator.cpp \
     rabbit.cpp \
     creature.cpp \
-    hunter.cpp
+    hunter.cpp \
+    wolf.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -43,7 +44,8 @@ HEADERS += \
     world.h \
     rabbit.h \
     creature.h \
-    hunter.h
+    hunter.h \
+    wolf.h
 
 FORMS += \
         mainwindow.ui

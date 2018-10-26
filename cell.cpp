@@ -4,6 +4,7 @@
 #include "world.h"
 #include <QDebug>
 #include "hunter.h"
+#include "wolf.h"
 
 // cell size in pixels when rendered
 const int cellSize = 100;
@@ -43,6 +44,7 @@ void Cell::renderAt(QPainter &painter, QPoint pos) const
     painter.save();
     painter.translate(pos * cellSize);
 
+    // terrain texture
     QImage texure;
     switch (terrain)
     {
@@ -58,13 +60,17 @@ void Cell::renderAt(QPainter &painter, QPoint pos) const
     }
     painter.drawImage(QRect(0, 0, cellSize, cellSize), texure);
 
+    // creatures
+    drawCreature(painter, getRabbitCount(), 68, ResourceManager::instance()->rabbitIcon());
+    drawCreature(painter, getCreatureCount(CREATURE_TYPE_HUNTER), 35, ResourceManager::instance()->hunterIcon());
+    drawCreature(painter, getCreatureCount(CREATURE_TYPE_WOLF), 3, ResourceManager::instance()->wolfIcon());
+
+    // weather icons
     painter.drawImage(QPoint(11, 1), ResourceManager::instance()->sunIcon());
     painter.drawImage(QPoint(36, 1), ResourceManager::instance()->rainIcon());
     painter.drawImage(QPoint(63, 1), ResourceManager::instance()->grassIcon());
 
-    drawCreature(painter, getRabbitCount(), 68, ResourceManager::instance()->rabbitIcon());
-    drawCreature(painter, getCreatureCount(CREATURE_TYPE_HUNTER), 35, ResourceManager::instance()->hunterIcon());
-
+    // weather values
     painter.setPen(Qt::white);
     painter.drawText(QPoint(26, 13), QString::number(sun));
     painter.drawText(QPoint(52, 13), QString::number(rain));

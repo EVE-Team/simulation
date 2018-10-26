@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QRandomGenerator>
 #include "hunter.h"
+#include "wolf.h"
 
 const double zoomScaleFactor = 1.5;
 const QSize worldSize(3, 3); // default world size
@@ -27,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->spnWidth->setValue(world.getSize().width());
     ui->spnHeight->setValue(world.getSize().height());
+
+    world.cellAt(0, 1)->addCreature(new Wolf());
 
     // render world
     redrawWorld();
@@ -85,9 +88,10 @@ void MainWindow::redrawWorld()
 
     // update total count of creatures
 
-    ui->lblGlobalStats->setText(QString("%1 rabbits in total\n%2 hunters in total").
+    ui->lblGlobalStats->setText(QString("%1 rabbits in total\n%2 hunters in total\n%3 wolves in total").
                                 arg(world.getCreaturePopulation(CREATURE_TYPE_RABBIT)).
-                                arg(world.getCreaturePopulation(CREATURE_TYPE_HUNTER)));
+                                arg(world.getCreaturePopulation(CREATURE_TYPE_HUNTER)).
+                                arg(world.getCreaturePopulation(CREATURE_TYPE_WOLF)));
 
     // update info on selected cell
 
@@ -167,13 +171,14 @@ void MainWindow::updateWatchedCell()
         ui->lblTileInfo->setText("Selected tile: None");
     } else {
         const static char* terrainNames[] = { "Grass", "Water", "Mountain" };
-        ui->lblTileInfo->setText(QString("Selected tile: %1x%2\nTerrain: %3\nSun: %4; Rain: %5\nGrass: %6\nRabbits: %7\nHunters: %8").
+        ui->lblTileInfo->setText(QString("Selected tile: %1x%2\nTerrain: %3\nSun: %4; Rain: %5\nGrass: %6\nRabbits: %7\nHunters: %8\nWolves: %9").
                 arg(watchedCell->getPosition().x() + 1).arg(watchedCell->getPosition().y() + 1).
                 arg(terrainNames[watchedCell->getTerrain()], QString::number(watchedCell->getSunLevel()),
                                  QString::number(watchedCell->getRainLevel()),
                                  QString::number(watchedCell->getGrassLevel()),
                                  QString::number(watchedCell->getRabbitCount()),
-                                 QString::number(watchedCell->getCreatureCount(CREATURE_TYPE_HUNTER))));
+                                 QString::number(watchedCell->getCreatureCount(CREATURE_TYPE_HUNTER))).
+                arg(watchedCell->getCreatureCount(CREATURE_TYPE_WOLF)));
     }
 }
 
@@ -289,6 +294,9 @@ void MainWindow::addCreatures(int creatureType, int count)
                 case CREATURE_TYPE_HUNTER:
                     newCreature = new Hunter();
                     break;
+                case CREATURE_TYPE_WOLF:
+                    newCreature = new Wolf();
+                    break;
                 default:
                     abort();
                 }
@@ -312,4 +320,9 @@ void MainWindow::on_btnAddRabbits_clicked()
 void MainWindow::on_btnAddHunters_clicked()
 {
     addCreatures(CREATURE_TYPE_HUNTER, ui->spnHunterCount->value());
+}
+
+void MainWindow::on_btnAddWolves_clicked()
+{
+    addCreatures(CREATURE_TYPE_WOLF, ui->spnWolfCount->value());
 }

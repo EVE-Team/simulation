@@ -44,7 +44,7 @@ void Hunter::advanceImpl()
 
 bool Hunter::hasRabbitsCondition(Cell *cell, int argument)
 {
-    return cell->getRabbitCount() > 0;
+    return (cell->getRabbitCount() > 0) && (cell->getCreatureCount(CREATURE_TYPE_HUNTER) < 3);
 }
 
 bool Hunter::eatRabbit(Cell *cell)

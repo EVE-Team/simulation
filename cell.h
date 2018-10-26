@@ -8,7 +8,7 @@
 class World;
 
 // assume there are 2 creature types for now
-#define NO_OF_CREATURE_TYPES 2
+#define NO_OF_CREATURE_TYPES 3
 
 extern const int maxRabbitCount, minGrass;
 

@@ -47,6 +47,8 @@ private slots:
 
     void on_btnAddHunters_clicked();
 
+    void on_btnAddWolves_clicked();
+
 private:
     Ui::MainWindow *ui;
 
