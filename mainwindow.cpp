@@ -70,16 +70,9 @@ void MainWindow::redrawWorld()
 
     //
 
-    int rabbitPopulation = 0;
-    for (int x = 0; x < world.getSize().width(); x++)
-    {
-        for (int y = 0 ; y < world.getSize().height(); y++)
-        {
-            rabbitPopulation += world.cellAt(x, y)->getRabbitCount();
-        }
-    }
-
-    ui->lblGlobalStats->setText(QString("%1 rabbits in total").arg(rabbitPopulation));
+    ui->lblGlobalStats->setText(QString("%1 rabbits in total\n%2 hunters in total").
+                                arg(world.getCreaturePopulation(CREATURE_TYPE_RABBIT)).
+                                arg(world.getCreaturePopulation(CREATURE_TYPE_HUNTER)));
 }
 
 // ignore "enumeration value '...' not handled in switch' warning

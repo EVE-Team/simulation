@@ -161,7 +161,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>300</y>
+       <y>310</y>
        <width>141</width>
        <height>101</height>
       </rect>
@@ -222,7 +222,7 @@
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>290</y>
+       <y>300</y>
        <width>118</width>
        <height>3</height>
       </rect>
@@ -237,11 +237,15 @@
        <x>10</x>
        <y>260</y>
        <width>141</width>
-       <height>17</height>
+       <height>41</height>
       </rect>
      </property>
      <property name="text">
-      <string>0 rabbits in total</string>
+      <string>0 rabbits in total
+0 hunters in total</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
      </property>
     </widget>
     <widget class="QSpinBox" name="spnHunterCount">

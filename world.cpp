@@ -87,3 +87,19 @@ void World::rebuildWorld()
         }
     }
 }
+
+int World::getCreaturePopulation(int creatureId)
+{
+    int creaturePopulation = 0;
+
+    const int w = getSize().width(), h = getSize().height();
+    for (int x = 0; x < w; x++)
+    {
+        for (int y = 0 ; y < h; y++)
+        {
+            creaturePopulation += cellAt(x, y)->getCreatureCount(creatureId);
+        }
+    }
+
+    return creaturePopulation;
+}

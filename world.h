@@ -13,12 +13,17 @@ public:
 
     void render(QPainter &painter);
 
+    // returns cell with coordinates (x, y)
+    // nullptr if no such cell exists
     Cell *cellAt(int x, int y);
 
     void resize(QSize size);
     QSize getSize() const;
 
     void advance();
+
+    // return total number of creatures with id creatureId existing in this world
+    int getCreaturePopulation(int creatureId);
 
 protected:
     QVector<Cell> cells;
