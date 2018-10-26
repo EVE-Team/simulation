@@ -13,5 +13,6 @@
         <file>grass4.png</file>
         <file>rabbit.png</file>
         <file>hunter.png</file>
+        <file>wolf.png</file>
     </qresource>
 </RCC>

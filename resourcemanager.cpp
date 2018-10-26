@@ -9,7 +9,8 @@ ResourceManager::ResourceManager()
       iconRain(":/images/rain.png"),
       iconGrass(":/images/grass_icon.png"),
       iconRabbit(":/images/rabbit.png"),
-      iconHunter(":/images/hunter.png")
+      iconHunter(":/images/hunter.png"),
+      iconWolf(":/images/wolf.png")
 {
     for (int i = 0; i <= 5; i++)
     {
@@ -63,4 +64,9 @@ const QImage &ResourceManager::rabbitIcon() const
 const QImage &ResourceManager::hunterIcon() const
 {
     return iconHunter;
+}
+
+const QImage &ResourceManager::wolfIcon() const
+{
+    return iconWolf;
 }
