@@ -29,8 +29,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->spnWidth->setValue(world.getSize().width());
     ui->spnHeight->setValue(world.getSize().height());
 
-    world.cellAt(0, 1)->addCreature(new Wolf());
-
     // render world
     redrawWorld();
 }

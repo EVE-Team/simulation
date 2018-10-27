@@ -26,6 +26,11 @@ public:
     // move this creature one tick forward in time
     void advance(int tickNumber);
 
+    // jump to a random adjacent cell that has grassy terrain and space for
+    // creature of our type
+    // returns true on success, false if remained in the same cell
+    bool jumpToRandomAdjacentCell();
+
 protected:
     Cell *parent;
     int id;
@@ -49,10 +54,6 @@ protected:
     typedef bool (*CellConditionFunct)(Cell *cell, int argument);
     Cell *findAdjacentCellByCondition(CellConditionFunct callback, int argument = 0) const;
 
-    // jump to a random adjacent cell that has grassy terrain and space for
-    // creature of our type
-    // returns true on success, false if remained in the same cell
-    bool jumpToRandomAdjacentCell();
     // for jumpToRandomAdjacentCell()
     static bool randomCellConditionChecker(Cell *cell, int argument);
 };
