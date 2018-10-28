@@ -8,6 +8,7 @@
 #include <QRandomGenerator>
 #include "hunter.h"
 #include "wolf.h"
+#include "populationgraph.h"
 
 const double zoomScaleFactor = 1.5;
 const QSize worldSize(3, 3); // default world size
@@ -29,6 +30,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->spnWidth->setValue(world.getSize().width());
     ui->spnHeight->setValue(world.getSize().height());
 
+    // show population graph window
+    graphWindow = new PopulationGraph();
+    graphWindow->show();
+
     // render world
     redrawWorld();
 }
@@ -48,6 +53,14 @@ void MainWindow::resizeEvent(QResizeEvent* event)
     ui->grControls->resize(ui->grControls->size().width(), ui->lblDrawArea->size().height());
 
     redrawWorld();
+}
+
+// ignore "unused parameter ‘...’" warning
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    graphWindow->close();
 }
 
 void MainWindow::redrawWorld()
@@ -229,9 +242,14 @@ void MainWindow::on_lblDrawArea_mouseButtonRelease(QMouseEvent *event)
 
 void MainWindow::on_btnTick_clicked()
 {
-    for (int i = 0; i < ui->spnTickCount->value(); i++)
+    const int tickCount = ui->spnTickCount->value();
+    for (int i = 0; i < tickCount; i++)
     {
         world.advance();
+        graphWindow->RegisterStats(world.getCreaturePopulation(CREATURE_TYPE_RABBIT),
+                                   world.getCreaturePopulation(CREATURE_TYPE_HUNTER),
+                                   world.getCreaturePopulation(CREATURE_TYPE_WOLF),
+                                   i == tickCount - 1);
     }
 
     redrawWorld();
@@ -241,6 +259,7 @@ void MainWindow::on_btnResize_clicked()
 {
     world.resize(QSize(ui->spnWidth->value(), ui->spnHeight->value()));
     redrawWorld();
+    graphWindow->ResetStats();
 }
 
 void MainWindow::addCreatures(int creatureType, int count)

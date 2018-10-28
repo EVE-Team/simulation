@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include "world.h"
 
+class PopulationGraph;
+
 namespace Ui {
 class MainWindow;
 }
@@ -25,6 +27,7 @@ protected:
     void on_lblDrawArea_mouseButtonRelease(QMouseEvent *event);
 
     void resizeEvent(QResizeEvent* event);
+    void closeEvent(QCloseEvent *event);
 
     void redrawWorld();
 
@@ -64,6 +67,8 @@ private:
     World world;
 
     Cell *watchedCell;
+
+    PopulationGraph *graphWindow;
 };
 
 #endif // MAINWINDOW_H

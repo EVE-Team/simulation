@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets
+QT       += core gui widgets charts
 
 TARGET = Simulation
 TEMPLATE = app
@@ -32,7 +32,8 @@ SOURCES += \
     rabbit.cpp \
     creature.cpp \
     hunter.cpp \
-    wolf.cpp
+    wolf.cpp \
+    populationgraph.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -45,10 +46,12 @@ HEADERS += \
     rabbit.h \
     creature.h \
     hunter.h \
-    wolf.h
+    wolf.h \
+    populationgraph.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    populationgraph.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
