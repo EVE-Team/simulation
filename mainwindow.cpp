@@ -97,13 +97,6 @@ void MainWindow::redrawWorld()
 
     ui->lblDrawArea->setPixmap(renderBuffer);
 
-    // update total count of creatures
-
-    ui->lblGlobalStats->setText(QString("%1 rabbits in total\n%2 hunters in total\n%3 wolves in total").
-                                arg(world.getCreaturePopulation(CREATURE_TYPE_RABBIT)).
-                                arg(world.getCreaturePopulation(CREATURE_TYPE_HUNTER)).
-                                arg(world.getCreaturePopulation(CREATURE_TYPE_WOLF)));
-
     // update info on selected cell
 
     updateWatchedCell();
