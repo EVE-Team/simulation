@@ -96,5 +96,7 @@ void Wolf::advanceImpl()
         {
             parent->getCreature(CREATURE_TYPE_RABBIT, i)->jumpToRandomAdjacentCell();
         }
+    } else {
+         jumpToRandomAdjacentCell();
     }
 }

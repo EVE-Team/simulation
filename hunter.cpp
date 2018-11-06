@@ -1,6 +1,7 @@
 #include "hunter.h"
 #include "cell.h"
 #include "rabbit.h"
+#include "wolf.h"
 #include <QDebug>
 
 Hunter::Hunter()
@@ -20,22 +21,67 @@ QString Hunter::getSpecies() const
 
 void Hunter::advanceImpl()
 {
-    if (eatRabbit(getParent()))
+    Cell *parent = getParent();
+    int wolfCount = parent->getCreatureCount(CREATURE_TYPE_WOLF);
+    int humanCount = parent->getCreatureCount(CREATURE_TYPE_HUNTER);
+
+    if (wolfCount > 0)
     {
+        // Если в клетке кролики, волки и люди, то разборка ведется только между людьми и волками, а
+        // кролики спокойно кушают травку.
+
+        if (humanCount > wolfCount) {
+            // Если волков меньше чем людей, то люди снимают шкуру с одного волка. Остальные волки
+            // прыгают на соседние клетки.
+            Creature *wolf = parent->getCreature(CREATURE_TYPE_WOLF, 0);
+            assert(wolf != nullptr);
+            parent->killCreature(wolf);
+
+            wolfCount = parent->getCreatureCount(CREATURE_TYPE_WOLF);
+            for (int i = 0; i < wolfCount; i++)
+            {
+                parent->getCreature(CREATURE_TYPE_WOLF, i)->jumpToRandomAdjacentCell();
+            }
+        } else if (humanCount < wolfCount) {
+            // Если в клетке волков больше чем людей, то волки обедают одним человеком. Остальные
+            // люди прыгают на соседние клетки.
+            Creature *human = parent->getCreature(CREATURE_TYPE_HUNTER, 0);
+            assert(human != nullptr);
+            parent->killCreature(human);
+
+            humanCount = parent->getCreatureCount(CREATURE_TYPE_HUNTER);
+            for (int i = 0; i < humanCount; i++)
+            {
+                parent->getCreature(CREATURE_TYPE_HUNTER, i)->jumpToRandomAdjacentCell();
+            }
+        } else if (humanCount == wolfCount) {
+            // Если волков и людей в одной клетке одинаковое количество, то все спасаются бегством в
+            // соседние клетки.
+            for (int i = 0; i < wolfCount; i++)
+            {
+                parent->getCreature(CREATURE_TYPE_WOLF, i)->jumpToRandomAdjacentCell();
+            }
+            for (int i = 0; i < humanCount; i++)
+            {
+                parent->getCreature(CREATURE_TYPE_HUNTER, i)->jumpToRandomAdjacentCell();
+            }
+
+        }
+    } else if (eatRabbit(getParent())) {
         // successfully eaten
         return;
-    }
-
-    // no rabbits in current cell
-    // try to find something to eat in adjacent cells
-    Cell *newCell = findAdjacentCellByCondition(hasRabbitsCondition);
-    if (newCell)
-    {
-        moveTo(newCell);
-        assert(eatRabbit(newCell));
     } else {
-        // don't sit in one place if there's nothing to eat
-        jumpToRandomAdjacentCell();
+        // no rabbits in current cell
+        // try to find something to eat in adjacent cells
+        Cell *newCell = findAdjacentCellByCondition(hasRabbitsCondition);
+        if (newCell)
+        {
+            moveTo(newCell);
+            assert(eatRabbit(newCell));
+        } else {
+            // don't sit in one place if there's nothing to eat
+            jumpToRandomAdjacentCell();
+        }
     }
 }
 
