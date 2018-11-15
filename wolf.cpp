@@ -37,7 +37,7 @@ void Wolf::advanceImpl()
     const int rabbitCount = parent->getCreatureCount(CREATURE_TYPE_RABBIT);
 
     if (humanCount > 0)
-    {
+    {        
         // Если в клетке кролики, волки и люди, то разборка ведется только между людьми и волками, а
         // кролики спокойно кушают травку.
 
@@ -51,7 +51,10 @@ void Wolf::advanceImpl()
             wolfCount = parent->getCreatureCount(CREATURE_TYPE_WOLF);
             for (int i = 0; i < wolfCount; i++)
             {
-                parent->getCreature(CREATURE_TYPE_WOLF, i)->jumpToRandomAdjacentCell();
+                Wolf* wolf = dynamic_cast<Wolf*>(parent->getCreature(CREATURE_TYPE_WOLF, i));
+                wolf->jumpToRandomAdjacentCell();
+                wolf->setLasTick(this->lastTick);
+                wolf->increaseStarveLevel();
             }
         } else if (humanCount < wolfCount) {
             // Если в клетке волков больше чем людей, то волки обедают одним человеком. Остальные
@@ -63,18 +66,27 @@ void Wolf::advanceImpl()
             humanCount = parent->getCreatureCount(CREATURE_TYPE_HUNTER);
             for (int i = 0; i < humanCount; i++)
             {
-                parent->getCreature(CREATURE_TYPE_HUNTER, i)->jumpToRandomAdjacentCell();
+                Hunter* hunter = dynamic_cast<Hunter*>(parent->getCreature(CREATURE_TYPE_HUNTER, i));
+                hunter->jumpToRandomAdjacentCell();
+                hunter->setLasTick(this->lastTick);
+                hunter->increaseStarveLevel();
             }
         } else if (humanCount == wolfCount) {
             // Если волков и людей в одной клетке одинаковое количество, то все спасаются бегством в
             // соседние клетки.
             for (int i = 0; i < wolfCount; i++)
             {
-                parent->getCreature(CREATURE_TYPE_WOLF, i)->jumpToRandomAdjacentCell();
+                Wolf* wolf = dynamic_cast<Wolf*>(parent->getCreature(CREATURE_TYPE_WOLF, i));
+                wolf->jumpToRandomAdjacentCell();
+                wolf->setLasTick(this->lastTick);
+                wolf->increaseStarveLevel();;
             }
             for (int i = 0; i < humanCount; i++)
             {
-                parent->getCreature(CREATURE_TYPE_HUNTER, i)->jumpToRandomAdjacentCell();
+                Hunter* hunter = dynamic_cast<Hunter*>(parent->getCreature(CREATURE_TYPE_HUNTER, i));
+                hunter->jumpToRandomAdjacentCell();
+                hunter->setLasTick(this->lastTick);
+                hunter->increaseStarveLevel();
             }
 
         }
@@ -84,6 +96,7 @@ void Wolf::advanceImpl()
 
         const int rabbitsToBeEaten = min(wolfCount * 2, rabbitCount);
         const int rabbitsRemaining = max(rabbitCount - rabbitsToBeEaten, 0);
+        const int satiatedWolfs = min(wolfCount, rabbitsToBeEaten);
 
         for (int i = 0; i < rabbitsToBeEaten; i++)
         {
@@ -96,7 +109,22 @@ void Wolf::advanceImpl()
         {
             parent->getCreature(CREATURE_TYPE_RABBIT, i)->jumpToRandomAdjacentCell();
         }
+
+        for (int i = 0; i < satiatedWolfs; i++)
+        {
+            Creature* wolf = parent->getCreature(CREATURE_TYPE_WOLF, i);
+            wolf->setLasTick(lastTick);
+            wolf->resetStarveLevel();
+        }
     } else {
          jumpToRandomAdjacentCell();
+    }
+    checkStarvation();
+}
+
+void Wolf::checkStarvation()
+{
+    if (starveLevel == MAX_STARVE_LEVEL){
+        this->die();
     }
 }

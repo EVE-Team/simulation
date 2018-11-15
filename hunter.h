@@ -19,6 +19,8 @@ protected:
 
     // used in finding new cell to jump to
     static bool hasRabbitsCondition(Cell *cell, int argument);
+
+    void checkStarvation();
 };
 
 #endif // HUNTER_H

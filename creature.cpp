@@ -38,6 +38,8 @@ void Creature::advance(int tickNumber)
     {
         return;
     }
+
+    starveLevel++;
     lastTick = tickNumber;
 
     advanceImpl();
@@ -100,8 +102,16 @@ bool Creature::randomCellConditionChecker(Cell *cell, int argument)
     return (cell->getTerrain() == Cell::Terrain::Grass) && (cell->getCreatureCount(argument) < 3);
 }
 
+void Creature::resetStarveLevel()
+{
+    this->starveLevel = 0;
+}
+
 bool Creature::jumpToRandomAdjacentCell()
 {
+    if (this == nullptr)
+        return false;
+
     // findAdjacentCellByCondition doesn't return strictly random cell, it prefers cells at corners
     // but close enough
     Cell *newCell = findAdjacentCellByCondition(randomCellConditionChecker, getType());
@@ -112,4 +122,14 @@ bool Creature::jumpToRandomAdjacentCell()
     } else {
         return false;
     }
+}
+
+void Creature::setLasTick(int lastTick)
+{
+    this->lastTick = lastTick;
+}
+
+void Creature::increaseStarveLevel()
+{
+    this->starveLevel++;
 }

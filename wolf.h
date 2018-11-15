@@ -13,6 +13,8 @@ public:
     virtual int getType() const;
     virtual QString getSpecies() const;
     virtual void advanceImpl();
+
+    void checkStarvation();
 };
 
 #endif // WOLF_H

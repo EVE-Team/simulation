@@ -4,6 +4,8 @@
 #include <QString>
 class Cell;
 
+const int MAX_STARVE_LEVEL = 10;
+
 class Creature
 {
 public:
@@ -31,10 +33,16 @@ public:
     // returns true on success, false if remained in the same cell
     bool jumpToRandomAdjacentCell();
 
+    void setLasTick(int lastTick);
+
+    void increaseStarveLevel();
+
+    void resetStarveLevel();
 protected:
     Cell *parent;
     int id;
     int lastTick;
+    int starveLevel = 0;
 
     // actual implementation of advance, after tickNumber check
     virtual void advanceImpl() = 0;
@@ -55,7 +63,7 @@ protected:
     Cell *findAdjacentCellByCondition(CellConditionFunct callback, int argument = 0) const;
 
     // for jumpToRandomAdjacentCell()
-    static bool randomCellConditionChecker(Cell *cell, int argument);
+    static bool randomCellConditionChecker(Cell *cell, int argument);    
 };
 
 #endif // CREATURE_H

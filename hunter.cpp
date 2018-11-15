@@ -40,7 +40,10 @@ void Hunter::advanceImpl()
             wolfCount = parent->getCreatureCount(CREATURE_TYPE_WOLF);
             for (int i = 0; i < wolfCount; i++)
             {
-                parent->getCreature(CREATURE_TYPE_WOLF, i)->jumpToRandomAdjacentCell();
+                Wolf* wolf = dynamic_cast<Wolf*>(parent->getCreature(CREATURE_TYPE_WOLF, i));
+                wolf->jumpToRandomAdjacentCell();
+                wolf->setLasTick(this->lastTick);
+                wolf->increaseStarveLevel();
             }
         } else if (humanCount < wolfCount) {
             // Если в клетке волков больше чем людей, то волки обедают одним человеком. Остальные
@@ -52,24 +55,32 @@ void Hunter::advanceImpl()
             humanCount = parent->getCreatureCount(CREATURE_TYPE_HUNTER);
             for (int i = 0; i < humanCount; i++)
             {
-                parent->getCreature(CREATURE_TYPE_HUNTER, i)->jumpToRandomAdjacentCell();
+                Hunter* hunter = dynamic_cast<Hunter*>(parent->getCreature(CREATURE_TYPE_HUNTER, i));
+                hunter->jumpToRandomAdjacentCell();
+                hunter->setLasTick(this->lastTick);
+                hunter->increaseStarveLevel();
             }
         } else if (humanCount == wolfCount) {
             // Если волков и людей в одной клетке одинаковое количество, то все спасаются бегством в
             // соседние клетки.
             for (int i = 0; i < wolfCount; i++)
             {
-                parent->getCreature(CREATURE_TYPE_WOLF, i)->jumpToRandomAdjacentCell();
+                Wolf* wolf = dynamic_cast<Wolf*>(parent->getCreature(CREATURE_TYPE_WOLF, i));
+                wolf->jumpToRandomAdjacentCell();
+                wolf->setLasTick(this->lastTick);
+                wolf->increaseStarveLevel();
             }
             for (int i = 0; i < humanCount; i++)
             {
-                parent->getCreature(CREATURE_TYPE_HUNTER, i)->jumpToRandomAdjacentCell();
+                Hunter* hunter = dynamic_cast<Hunter*>(parent->getCreature(CREATURE_TYPE_HUNTER, i));
+                hunter->jumpToRandomAdjacentCell();
+                hunter->setLasTick(this->lastTick);
+                hunter->increaseStarveLevel();
             }
 
         }
     } else if (eatRabbit(getParent())) {
-        // successfully eaten
-        return;
+        // successfully eaten        
     } else {
         // no rabbits in current cell
         // try to find something to eat in adjacent cells
@@ -83,6 +94,7 @@ void Hunter::advanceImpl()
             jumpToRandomAdjacentCell();
         }
     }
+    checkStarvation();
 }
 
 // ignore "unused parameter ‘argument’" warning
@@ -102,6 +114,14 @@ bool Hunter::eatRabbit(Cell *cell)
         Creature *rabbit = cell->getCreature(CREATURE_TYPE_RABBIT, 0);
         assert(rabbit != nullptr);
         cell->killCreature(rabbit);
+        resetStarveLevel();
         return true;
+    }
+}
+
+void Hunter::checkStarvation()
+{
+    if (starveLevel == MAX_STARVE_LEVEL){
+        this->die();
     }
 }
